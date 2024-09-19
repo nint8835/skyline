@@ -1,0 +1,21 @@
+[project]
+name = "skyline"
+version = "0.1.0"
+description = "Generate 3D models of your GitHub activity"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "pydantic>=2.9.2",
+    "pydantic-settings>=2.5.2",
+    "typer>=0.12.5",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "uvicorn>=0.30.6",
+    "aiosqlite>=0.20.0",
+    "alembic>=1.13.2",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.6.5",
+]
