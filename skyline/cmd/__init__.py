@@ -4,7 +4,6 @@ import uvicorn
 
 from skyline.config import config
 
-
 app = typer.Typer()
 
 

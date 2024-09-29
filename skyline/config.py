@@ -9,8 +9,11 @@ class Config(BaseSettings):
 
     bind_host: str = "0.0.0.0"
     bind_port: int = 8000
-
     behind_reverse_proxy: bool = False
+    session_secret: str = "change_me"
+
+    github_client_id: str
+    github_client_secret: str
 
     @property
     def async_db_connection_uri(self) -> str:
@@ -21,6 +24,6 @@ class Config(BaseSettings):
         return f"sqlite:///{self.db_path}"
 
 
-config = Config()
+config = Config()  # type: ignore - Pyright doesn't know about pydantic_settings
 
 __all__ = ["config"]
