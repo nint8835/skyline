@@ -1,23 +1,9 @@
 from typing import cast
 
-from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import RedirectResponse
 
-from skyline.config import config
-
-oauth = OAuth()
-oauth.register(
-    "github",
-    client_id=config.github_client_id,
-    client_secret=config.github_client_secret,
-    api_base_url="https://api.github.com/",
-    access_token_url="https://github.com/login/oauth/access_token",
-    authorize_url="https://github.com/login/oauth/authorize",
-    client_kwargs={
-        "scope": "read:user",
-    },
-)
+from skyline.dependencies.auth import get_username, oauth
 
 auth_router = APIRouter(tags=["Auth"])
 
@@ -32,10 +18,27 @@ async def login(request: Request) -> Response:
 async def oauth_callback(request: Request) -> Response:
     token = await oauth.github.authorize_access_token(request)
 
-    user = await oauth.github.get("user", token=token)
+    user = (await oauth.github.get("user", token=token)).json()
 
-    print(user.json())
+    request.session["user"] = user["login"]
+    request.session["token"] = token
+
     return RedirectResponse(url="/")
+
+
+@auth_router.route("/logout", include_in_schema=False)
+async def logout(request: Request) -> Response:
+    request.session.pop("user", None)
+    request.session.pop("token", None)
+    return RedirectResponse(url="/")
+
+
+@auth_router.get("/me")
+async def get_current_user(
+    user: str | None = Depends(get_username),
+) -> str | None:
+    """Retrieve the details of the current user."""
+    return user
 
 
 __all__ = ["auth_router"]
