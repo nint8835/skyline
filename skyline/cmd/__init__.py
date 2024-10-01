@@ -1,8 +1,16 @@
+import logging
+
 import alembic.config
+import structlog
 import typer
 import uvicorn
 
 from skyline.config import config
+
+structlog.stdlib.recreate_defaults(log_level=logging.WARNING)
+structlog.stdlib.get_logger("skyline").setLevel(
+    logging.getLevelNamesMapping()[config.log_level]
+)
 
 app = typer.Typer()
 

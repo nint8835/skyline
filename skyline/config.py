@@ -15,6 +15,8 @@ class Config(BaseSettings):
     github_client_id: str
     github_client_secret: str
 
+    log_level: str = "INFO"
+
     @property
     def async_db_connection_uri(self) -> str:
         return f"sqlite+aiosqlite:///{self.db_path}"

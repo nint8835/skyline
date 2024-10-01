@@ -1,8 +1,8 @@
 """Create initial ContributionData model
 
-Revision ID: 7456e404c50c
+Revision ID: 82a9de3f72c4
 Revises:
-Create Date: 2024-10-01 18:20:25.185638
+Create Date: 2024-10-01 20:22:00.333838
 
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "7456e404c50c"
+revision: str = "82a9de3f72c4"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -23,7 +23,12 @@ def upgrade() -> None:
         "contribution_data",
         sa.Column("user", sa.String(), nullable=False),
         sa.Column("year", sa.Integer(), nullable=False),
-        sa.Column("contributions", sa.JSON(), nullable=False),
+        sa.Column("contributions", sa.String(), nullable=False),
+        sa.Column(
+            "importer",
+            sa.Enum("User", "Bot", name="contributionimporter", native_enum=False),
+            nullable=False,
+        ),
         sa.PrimaryKeyConstraint("user", "year"),
     )
 

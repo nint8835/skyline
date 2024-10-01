@@ -1,7 +1,17 @@
-from sqlalchemy import JSON
+from datetime import date
+from enum import Enum
+
+from pydantic import RootModel
 from sqlalchemy.orm import Mapped, mapped_column
 
 from skyline.db import Base
+
+Contributions = RootModel[dict[date, int]]
+
+
+class ContributionImporter(Enum):
+    User = "user"
+    Bot = "bot"
 
 
 class ContributionData(Base):
@@ -9,4 +19,8 @@ class ContributionData(Base):
 
     user: Mapped[str] = mapped_column(primary_key=True)
     year: Mapped[int] = mapped_column(primary_key=True)
-    contributions: Mapped[dict[str, int]] = mapped_column(JSON)
+    contributions: Mapped[str]
+    importer: Mapped[ContributionImporter]
+
+
+__all__ = ["Contributions", "ContributionData", "ContributionImporter"]
