@@ -2,3 +2,5 @@
 
 # Utility file to ensure all models are imported for Alembic auto-generation.
 # Should not be imported outside of skyline.migrations.env
+
+from .contribution_data import ContributionData  # type: ignore
