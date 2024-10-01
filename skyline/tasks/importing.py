@@ -3,7 +3,6 @@ from typing import Any, cast
 
 import httpx
 import structlog
-from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from skyline.dependencies.auth import oauth
@@ -12,6 +11,8 @@ from skyline.models.contribution_data import (
     ContributionImporter,
     Contributions,
 )
+
+from .importing_models import ContributionsQueryResponse
 
 logger = structlog.get_logger()
 
@@ -31,41 +32,6 @@ query ($user: String!, $start: DateTime!, $end: DateTime!) {
     }
 }
 """
-
-
-class ContributionsQueryContributionDay(BaseModel):
-    date: date
-    contribution_count: int = Field(alias="contributionCount")
-
-
-class ContributionsQueryContributionWeek(BaseModel):
-    contribution_days: list[ContributionsQueryContributionDay] = Field(
-        alias="contributionDays"
-    )
-
-
-class ContributionsQueryContributionCalendar(BaseModel):
-    weeks: list[ContributionsQueryContributionWeek]
-
-
-class ContributionsQueryContributionCollection(BaseModel):
-    contribution_calendar: ContributionsQueryContributionCalendar = Field(
-        alias="contributionCalendar"
-    )
-
-
-class ContributionsQueryUser(BaseModel):
-    contributions_collection: ContributionsQueryContributionCollection = Field(
-        alias="contributionsCollection"
-    )
-
-
-class ContributionsQueryData(BaseModel):
-    user: ContributionsQueryUser
-
-
-class ContributionsQueryResponse(BaseModel):
-    data: ContributionsQueryData
 
 
 async def import_year(user: str, token: Any, year: int, session: AsyncSession) -> None:
