@@ -3,19 +3,27 @@ from typing import Sequence
 
 import cadquery
 
+GRID_SQUARE_SIZE = 3
+GRID_BASE_HEIGHT = 2
+
 
 def skyline_model(days: Sequence[int | None]) -> bytes:
     grid = cadquery.Assembly()
 
     for index, count in enumerate(days):
-        col_offset = 10 * (index // 7)
-        row_offset = 10 * (index % 7)
+        col_offset = GRID_SQUARE_SIZE * (index // 7)
+        row_offset = GRID_SQUARE_SIZE * (index % 7)
 
         if count is None:
             continue
 
         grid.add(
-            cadquery.Workplane("XY").box(10, 10, count + 2, centered=False),
+            cadquery.Workplane("XY").box(
+                GRID_SQUARE_SIZE,
+                GRID_SQUARE_SIZE,
+                count + GRID_BASE_HEIGHT,
+                centered=False,
+            ),
             loc=cadquery.Location(cadquery.Vector(row_offset, col_offset, 0)),
         )
 
