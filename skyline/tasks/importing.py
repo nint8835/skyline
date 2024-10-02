@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any, cast
+from typing import Any, Awaitable, Callable, cast
 
 import httpx
 import structlog
@@ -33,28 +33,46 @@ query ($user: String!, $start: DateTime!, $end: DateTime!) {
 }
 """
 
+type ContributionQuerier = Callable[[str, int], Awaitable[ContributionsQueryResponse]]
 
-async def import_year(user: str, token: Any, year: int, session: AsyncSession) -> None:
-    logger.info("Importing contributions", user=user, year=year)
 
-    resp = cast(
-        httpx.Response,
-        await oauth.github.post(
-            "/graphql",
-            json={
-                "query": CONTRIBUTIONS_QUERY,
-                "variables": {
-                    "user": user,
-                    "start": f"{year}-01-01T00:00:00Z",
-                    "end": f"{year}-12-31T23:59:59Z",
+def oauth_contribution_querier(token: Any) -> ContributionQuerier:
+    async def _contribution_querier(
+        user: str,
+        year: int,
+    ) -> ContributionsQueryResponse:
+        resp = cast(
+            httpx.Response,
+            await oauth.github.post(
+                "/graphql",
+                json={
+                    "query": CONTRIBUTIONS_QUERY,
+                    "variables": {
+                        "user": user,
+                        "start": f"{year}-01-01T00:00:00Z",
+                        "end": f"{year}-12-31T23:59:59Z",
+                    },
                 },
-            },
-            token=token,
-        ),
-    )
-    resp.raise_for_status()
+                token=token,
+            ),
+        )
+        resp.raise_for_status()
 
-    data = ContributionsQueryResponse.model_validate(resp.json())
+        return ContributionsQueryResponse.model_validate(resp.json())
+
+    return _contribution_querier
+
+
+async def import_year(
+    user: str,
+    year: int,
+    importer: ContributionImporter,
+    session: AsyncSession,
+    querier: ContributionQuerier,
+) -> None:
+    logger.info("Importing contributions", user=user, year=year, importer=importer)
+
+    data = await querier(user, year)
 
     simplified_contributions: dict[date, int] = {}
     total_contributions = 0
@@ -79,6 +97,7 @@ async def import_year(user: str, token: Any, year: int, session: AsyncSession) -
         "Imported contributions",
         user=user,
         year=year,
+        importer=importer,
         total_contributions=total_contributions,
     )
 
@@ -88,7 +107,13 @@ async def import_contributions(user: str, token: Any, session: AsyncSession) -> 
     # TODO: Handle years that are already imported
     # TODO: Do two import passes - one as the user, one as the bot
     for year in range(2016, 2024):
-        await import_year(user, token, year, session)
+        await import_year(
+            user,
+            year,
+            ContributionImporter.User,
+            session,
+            oauth_contribution_querier(token),
+        )
 
 
 __all__ = ["import_contributions"]

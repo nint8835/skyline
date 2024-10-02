@@ -14,6 +14,7 @@ class Config(BaseSettings):
 
     github_client_id: str
     github_client_secret: str
+    github_machine_user_pat: str
 
     log_level: str = "INFO"
 
