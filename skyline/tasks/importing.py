@@ -5,6 +5,7 @@ import httpx
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from skyline.config import config
 from skyline.dependencies.auth import oauth
 from skyline.models.contribution_data import (
     ContributionData,
@@ -34,6 +35,25 @@ query ($user: String!, $start: DateTime!, $end: DateTime!) {
 """
 
 type ContributionQuerier = Callable[[str, int], Awaitable[ContributionsQueryResponse]]
+
+
+async def bot_contribution_querier(user: str, year: int) -> ContributionsQueryResponse:
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            "https://api.github.com/graphql",
+            json={
+                "query": CONTRIBUTIONS_QUERY,
+                "variables": {
+                    "user": user,
+                    "start": f"{year}-01-01T00:00:00Z",
+                    "end": f"{year}-12-31T23:59:59Z",
+                },
+            },
+            headers={"Authorization": f"Bearer {config.github_machine_user_pat}"},
+        )
+
+    resp.raise_for_status()
+    return ContributionsQueryResponse.model_validate(resp.json())
 
 
 def oauth_contribution_querier(token: Any) -> ContributionQuerier:
@@ -89,7 +109,7 @@ async def import_year(
             contributions=Contributions.model_validate(
                 simplified_contributions
             ).model_dump_json(),
-            importer=ContributionImporter.User,
+            importer=importer,
         )
         session.add(contributions)
 
@@ -105,7 +125,6 @@ async def import_year(
 async def import_contributions(user: str, token: Any, session: AsyncSession) -> None:
     # TODO: Don't hardcode years
     # TODO: Handle years that are already imported
-    # TODO: Do two import passes - one as the user, one as the bot
     for year in range(2016, 2024):
         await import_year(
             user,
@@ -113,6 +132,13 @@ async def import_contributions(user: str, token: Any, session: AsyncSession) -> 
             ContributionImporter.User,
             session,
             oauth_contribution_querier(token),
+        )
+        await import_year(
+            user,
+            year,
+            ContributionImporter.Bot,
+            session,
+            bot_contribution_querier,
         )
 
 

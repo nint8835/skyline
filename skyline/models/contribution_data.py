@@ -13,14 +13,17 @@ class ContributionImporter(Enum):
     User = "user"
     Bot = "bot"
 
+    def __repr__(self) -> str:
+        return self.value
+
 
 class ContributionData(Base):
     __tablename__ = "contribution_data"
 
     user: Mapped[str] = mapped_column(primary_key=True)
     year: Mapped[int] = mapped_column(primary_key=True)
+    importer: Mapped[ContributionImporter] = mapped_column(primary_key=True)
     contributions: Mapped[str]
-    importer: Mapped[ContributionImporter]
 
 
 __all__ = ["Contributions", "ContributionData", "ContributionImporter"]
