@@ -1,10 +1,10 @@
-import io
+import tempfile
 from typing import Sequence
 
 import cadquery
 
 
-def skyline_model(days: Sequence[int | None]) -> str:
+def skyline_model(days: Sequence[int | None]) -> bytes:
     grid = cadquery.Assembly()
 
     for index, count in enumerate(days):
@@ -23,12 +23,11 @@ def skyline_model(days: Sequence[int | None]) -> str:
         cadquery.Workplane("XY").center(0, 0).workplane().add(grid.toCompound())
     )
 
-    out = io.StringIO()
+    with tempfile.TemporaryDirectory(prefix="skyline_") as tmpdir:
+        skyline_workplane.export(f"{tmpdir}/skyline.stl")
 
-    # TODO: exportShape is deprecated - find an alternative way of exporting a file without writing to disk
-    cadquery.exporters.exportShape(skyline_workplane, "STL", out)  # type: ignore
-
-    return out.getvalue()
+        with open(f"{tmpdir}/skyline.stl", "rb") as f:
+            return f.read()
 
 
 __all__ = ["skyline_model"]
