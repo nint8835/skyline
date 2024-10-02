@@ -3,6 +3,7 @@ from typing import Any, Awaitable, Callable, cast
 
 import httpx
 import structlog
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from skyline.config import config
@@ -92,6 +93,24 @@ async def import_year(
 ) -> None:
     logger.info("Importing contributions", user=user, year=year, importer=importer)
 
+    async with session.begin():
+        existing = (
+            await session.execute(
+                select(ContributionData).filter_by(
+                    user=user, year=year, importer=importer
+                )
+            )
+        ).scalar_one_or_none()
+
+        if existing:
+            logger.info(
+                "Contributions already imported",
+                user=user,
+                year=year,
+                importer=importer,
+            )
+            return
+
     data = await querier(user, year)
 
     simplified_contributions: dict[date, int] = {}
@@ -122,24 +141,23 @@ async def import_year(
     )
 
 
-async def import_contributions(user: str, token: Any, session: AsyncSession) -> None:
-    # TODO: Don't hardcode years
-    # TODO: Handle years that are already imported
-    for year in range(2016, 2024):
-        await import_year(
-            user,
-            year,
-            ContributionImporter.User,
-            session,
-            oauth_contribution_querier(token),
-        )
-        await import_year(
-            user,
-            year,
-            ContributionImporter.Bot,
-            session,
-            bot_contribution_querier,
-        )
+async def import_contributions(
+    user: str, year: int, token: Any, session: AsyncSession
+) -> None:
+    await import_year(
+        user,
+        year,
+        ContributionImporter.User,
+        session,
+        oauth_contribution_querier(token),
+    )
+    await import_year(
+        user,
+        year,
+        ContributionImporter.Bot,
+        session,
+        bot_contribution_querier,
+    )
 
 
 __all__ = ["import_contributions"]
