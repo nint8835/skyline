@@ -3,6 +3,7 @@
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "python.analysis.typeCheckingMode": "strict",
     "editor.codeActionsOnSave": {
         "source.organizeImports": "always",
