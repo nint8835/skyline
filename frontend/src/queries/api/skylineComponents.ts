@@ -129,6 +129,46 @@ export const useGetModel = <TData = void>(
     });
 };
 
+export type GetYearsError = Fetcher.ErrorWrapper<undefined>;
+
+export type GetYearsResponse = number[];
+
+export type GetYearsVariables = SkylineContext['fetcherOptions'];
+
+/**
+ * Get a list of years for which contributions have been imported.
+ */
+export const fetchGetYears = (variables: GetYearsVariables, signal?: AbortSignal) =>
+    skylineFetch<GetYearsResponse, GetYearsError, undefined, {}, {}, {}>({
+        url: '/contributions/years',
+        method: 'get',
+        ...variables,
+        signal,
+    });
+
+/**
+ * Get a list of years for which contributions have been imported.
+ */
+export const useGetYears = <TData = GetYearsResponse>(
+    variables: GetYearsVariables,
+    options?: Omit<
+        reactQuery.UseQueryOptions<GetYearsResponse, GetYearsError, TData>,
+        'queryKey' | 'queryFn' | 'initialData'
+    >,
+) => {
+    const { fetcherOptions, queryOptions, queryKeyFn } = useSkylineContext(options);
+    return reactQuery.useQuery<GetYearsResponse, GetYearsError, TData>({
+        queryKey: queryKeyFn({
+            path: '/contributions/years',
+            operationId: 'getYears',
+            variables,
+        }),
+        queryFn: ({ signal }) => fetchGetYears({ ...fetcherOptions, ...variables }, signal),
+        ...options,
+        ...queryOptions,
+    });
+};
+
 export type QueryOperation =
     | {
           path: '/auth/me';
@@ -139,4 +179,9 @@ export type QueryOperation =
           path: '/contributions/model/{user}/{year}';
           operationId: 'getModel';
           variables: GetModelVariables;
+      }
+    | {
+          path: '/contributions/years';
+          operationId: 'getYears';
+          variables: GetYearsVariables;
       };

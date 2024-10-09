@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Sequence
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
 from sqlalchemy import select
@@ -71,6 +71,26 @@ async def get_model(
             "Content-Disposition": f"attachment; filename={user}-{year}.stl",
         },
     )
+
+
+@contributions_router.get("/years")
+async def get_years(
+    user: str = Depends(require_user),
+    db: AsyncSession = Depends(get_db),
+) -> Sequence[int]:
+    """Get a list of years for which contributions have been imported."""
+    async with db.begin():
+        years = (
+            (
+                await db.execute(
+                    select(ContributionData.year).filter_by(user=user).distinct()
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+    return years
 
 
 __all__ = ["contributions_router"]
