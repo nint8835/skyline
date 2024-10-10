@@ -48,6 +48,9 @@ export const useGetCurrentUser = <TData = string | null>(
 };
 
 export type StartImportPathParams = {
+    /**
+     * The year to import contributions for.
+     */
     year: number;
 };
 

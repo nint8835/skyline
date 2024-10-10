@@ -1,6 +1,6 @@
-from typing import Any, Sequence
+from typing import Annotated, Any, Sequence
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
+from fastapi import APIRouter, Depends, Path, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,16 +20,28 @@ contributions_router = APIRouter(tags=["Contributions"])
 @contributions_router.post(
     "/import/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthenticated"},
+        status.HTTP_409_CONFLICT: {"description": "Contributions Already Imported"},
+    },
 )
 async def start_import(
-    year: int,
-    background_tasks: BackgroundTasks,
+    year: Annotated[int, Path(description="The year to import contributions for.")],
     user: str = Depends(require_user),
     token: Any = Depends(require_token),
     db: AsyncSession = Depends(get_db),
 ):
     """Import contributions for the current user."""
-    background_tasks.add_task(import_contributions, user, year, token, db)
+    async with db.begin():
+        is_imported = (
+            await db.execute(
+                select(ContributionData).filter_by(user=user, year=year).limit(1)
+            )
+        ).scalar_one_or_none()
+        if is_imported:
+            return Response(status_code=status.HTTP_409_CONFLICT)
+
+    await import_contributions(user, year, token, db)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
