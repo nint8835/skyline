@@ -1,8 +1,9 @@
 import { Bounds, Center, OrbitControls } from '@react-three/drei';
 import { Canvas, useLoader } from '@react-three/fiber';
+import { Suspense } from 'react';
 import { STLLoader } from 'three-stdlib';
 
-export function Viewer({ year, user }: { year: number; user: string }) {
+function ViewerCanvas({ year, user }: { year: number; user: string }) {
     const stl = useLoader(STLLoader, `/contributions/model/${user}/${year}`);
 
     return (
@@ -18,5 +19,13 @@ export function Viewer({ year, user }: { year: number; user: string }) {
             <ambientLight intensity={0.25} />
             <directionalLight position={[-1, 5, -1]} intensity={1} />
         </Canvas>
+    );
+}
+
+export function Viewer({ year, user }: { year: number; user: string }) {
+    return (
+        <Suspense fallback={null}>
+            <ViewerCanvas key={year} year={year} user={user} />{' '}
+        </Suspense>
     );
 }
