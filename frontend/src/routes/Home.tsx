@@ -2,6 +2,7 @@ import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
+import { cn } from '@/lib/util';
 import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
 import { type ChangeEvent, useState } from 'react';
@@ -74,7 +75,10 @@ function BottomBar({
                             ))}
                         </Select>
                         <a
-                            className="flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-colors hover:bg-emerald-700"
+                            className={cn(
+                                'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
+                                !selectedYear && 'pointer-events-none opacity-50',
+                            )}
                             href={`/contributions/model/${user}/${selectedYear}`}
                         >
                             Download
