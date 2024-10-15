@@ -74,7 +74,7 @@ function BottomBar({
                             ))}
                         </Select>
                         <a
-                            className="w-1/3 rounded-md bg-emerald-600 p-4 transition-colors hover:bg-emerald-700"
+                            className="flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-colors hover:bg-emerald-700"
                             href={`/contributions/model/${user}/${selectedYear}`}
                         >
                             Download
