@@ -1,7 +1,8 @@
 import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
+import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { useGetYears } from '@/queries/api/skylineComponents';
+import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
 import { type ChangeEvent, useState } from 'react';
 
@@ -27,13 +28,29 @@ function BottomBar({
     selectedYear: number | undefined;
     setSelectedYear: (year: number | undefined) => void;
 }) {
-    const { data: availableYears } = useGetYears({});
+    const { data: availableYears, isPending: yearsPending } = useGetYears({});
+    const { mutateAsync: importYear, isPending: importPending } = useStartImport();
+    const { user } = useStore();
 
-    const [importYearSelection, setImportYearSelection] = useState<number | undefined>();
+    const [importYearSelection, setImportYearSelection] = useState<number | null>(null);
 
-    if (!availableYears) {
-        // TODO: Better loading UI
-        return null;
+    if (yearsPending || importPending || availableYears === undefined) {
+        return (
+            <div className="flex h-fit flex-col items-center bg-zinc-800 p-4 md:grid-cols-2">
+                <div className="h-24 w-24 animate-spin rounded-full border-r-2 border-emerald-500"></div>
+            </div>
+        );
+    }
+
+    async function handleImport() {
+        if (!importYearSelection) {
+            return;
+        }
+
+        await importYear({ pathParams: { year: importYearSelection } });
+        queryClient.invalidateQueries({ queryKey: ['contributions', 'years'] });
+        setSelectedYear(importYearSelection);
+        setImportYearSelection(null);
     }
 
     return (
@@ -56,9 +73,12 @@ function BottomBar({
                                 </option>
                             ))}
                         </Select>
-                        <Button className="w-1/3 rounded-md bg-emerald-600 p-4 transition-colors hover:bg-emerald-700">
+                        <a
+                            className="w-1/3 rounded-md bg-emerald-600 p-4 transition-colors hover:bg-emerald-700"
+                            href={`/contributions/model/${user}/${selectedYear}`}
+                        >
                             Download
-                        </Button>
+                        </a>
                     </div>
                 </Field>
                 <Field className="flex flex-col gap-2">
@@ -69,12 +89,15 @@ function BottomBar({
                             type="number"
                             min={2007}
                             max={new Date().getFullYear() - 1}
-                            value={importYearSelection}
+                            value={importYearSelection || ''}
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                setImportYearSelection(parseInt(e.target.value, 10) || undefined)
+                                setImportYearSelection(parseInt(e.target.value, 10) || null)
                             }
                         />
-                        <Button className="w-1/3 rounded-md bg-violet-600 p-4 transition-colors hover:bg-violet-700">
+                        <Button
+                            className="w-1/3 rounded-md bg-violet-600 p-4 transition-colors hover:bg-violet-700"
+                            onClick={handleImport}
+                        >
                             Import
                         </Button>
                     </div>
