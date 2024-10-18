@@ -4,6 +4,7 @@ import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
 import { cn } from '@/lib/util';
 import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
+import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
 import { type ChangeEvent, useState } from 'react';
 
@@ -33,6 +34,24 @@ function BottomBar({
     const { mutateAsync: importYear, isPending: importPending } = useStartImport();
     const { user } = useStore();
 
+    // Tooltip hooks
+    const [importExplanationTooltipOpen, setImportExplanationTooltipOpen] = useState(false);
+    const {
+        refs: importExplanationTooltipRefs,
+        floatingStyles: importExplanationTooltipStyles,
+        context: importExplanationTooltipContext,
+    } = useFloating({
+        open: importExplanationTooltipOpen,
+        onOpenChange: setImportExplanationTooltipOpen,
+    });
+    const { isMounted: importExplanationTooltipIsMounted, styles: importExplanationTooltipTransitionStyles } =
+        useTransitionStyles(importExplanationTooltipContext);
+    const importExplanationTooltipHover = useHover(importExplanationTooltipContext);
+    const {
+        getReferenceProps: importExplanationTooltipGetReferenceProps,
+        getFloatingProps: importExplanationTooltipGetFloatingProps,
+    } = useInteractions([importExplanationTooltipHover]);
+
     const [importYearSelection, setImportYearSelection] = useState<number | null>(null);
 
     if (yearsPending || importPending || availableYears === undefined) {
@@ -57,34 +76,52 @@ function BottomBar({
     return (
         <div className="flex h-fit flex-col items-center bg-zinc-800 p-4 md:grid-cols-2">
             <div className="w-full space-y-4 md:w-1/3">
-                <Field className="flex flex-col gap-2">
-                    <Label className="font-semibold">Year</Label>
-                    <div className="flex gap-2">
-                        <Select
-                            className="flex-1 rounded-md bg-zinc-900 p-4"
-                            value={selectedYear}
-                            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                                setSelectedYear(parseInt(e.target.value, 10) || undefined)
-                            }
-                        >
-                            <option>Select a year</option>
-                            {availableYears.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
-                        </Select>
-                        <a
-                            className={cn(
-                                'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
-                                !selectedYear && 'pointer-events-none opacity-50',
-                            )}
-                            href={`/contributions/model/${user}/${selectedYear}`}
-                        >
-                            Download
-                        </a>
+                <div ref={importExplanationTooltipRefs.setReference} {...importExplanationTooltipGetReferenceProps()}>
+                    <Field
+                        className={cn(
+                            'flex flex-col gap-2 transition-all',
+                            !availableYears.length && 'pointer-events-none opacity-50',
+                        )}
+                    >
+                        <Label className="font-semibold">Year</Label>
+                        <div className="flex gap-2">
+                            <Select
+                                className="flex-1 rounded-md bg-zinc-900 p-4"
+                                value={selectedYear}
+                                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                                    setSelectedYear(parseInt(e.target.value, 10) || undefined)
+                                }
+                            >
+                                <option>Select a year</option>
+                                {availableYears.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </Select>
+                            <a
+                                className={cn(
+                                    'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
+                                    !selectedYear && 'pointer-events-none opacity-50',
+                                )}
+                                href={`/contributions/model/${user}/${selectedYear}`}
+                            >
+                                Download
+                            </a>
+                        </div>
+                    </Field>
+                </div>
+                {importExplanationTooltipIsMounted && !availableYears.length && (
+                    <div
+                        ref={importExplanationTooltipRefs.setFloating}
+                        style={{ ...importExplanationTooltipStyles, ...importExplanationTooltipTransitionStyles }}
+                        {...importExplanationTooltipGetFloatingProps()}
+                    >
+                        <div className="rounded-md bg-zinc-700 p-2 text-center">
+                            You must import your contribution data before you can generate a model.
+                        </div>
                     </div>
-                </Field>
+                )}
                 <Field className="flex flex-col gap-2">
                     <Label className="font-semibold">Import a year</Label>
                     <div className="flex gap-2">
