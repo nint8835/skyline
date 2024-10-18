@@ -3,6 +3,14 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { Suspense } from 'react';
 import { STLLoader } from 'three-stdlib';
 
+function LoadingIndicator() {
+    return (
+        <div className="flex h-full flex-col items-center justify-center">
+            <div className="h-24 w-24 animate-spin rounded-full border-r-2 border-emerald-500"></div>
+        </div>
+    );
+}
+
 function ViewerCanvas({ year }: { year: number }) {
     const stl = useLoader(STLLoader, `/contributions/model/${year}`);
 
@@ -24,8 +32,8 @@ function ViewerCanvas({ year }: { year: number }) {
 
 export function Viewer({ year }: { year: number }) {
     return (
-        <Suspense fallback={null}>
-            <ViewerCanvas key={year} year={year} />{' '}
+        <Suspense fallback={<LoadingIndicator />}>
+            <ViewerCanvas year={year} />
         </Suspense>
     );
 }
