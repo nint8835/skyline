@@ -46,10 +46,10 @@ async def start_import(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@contributions_router.get("/model/{user}/{year}")
+@contributions_router.get("/model/{year}", include_in_schema=False)
 async def get_model(
-    user: str,
     year: int,
+    user: str = Depends(require_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retrieve the contributions model for a given user and year."""

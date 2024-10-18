@@ -3,8 +3,8 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { Suspense } from 'react';
 import { STLLoader } from 'three-stdlib';
 
-function ViewerCanvas({ year, user }: { year: number; user: string }) {
-    const stl = useLoader(STLLoader, `/contributions/model/${user}/${year}`);
+function ViewerCanvas({ year }: { year: number }) {
+    const stl = useLoader(STLLoader, `/contributions/model/${year}`);
 
     return (
         <Canvas shadows>
@@ -22,10 +22,10 @@ function ViewerCanvas({ year, user }: { year: number; user: string }) {
     );
 }
 
-export function Viewer({ year, user }: { year: number; user: string }) {
+export function Viewer({ year }: { year: number }) {
     return (
         <Suspense fallback={null}>
-            <ViewerCanvas key={year} year={year} user={user} />{' '}
+            <ViewerCanvas key={year} year={year} />{' '}
         </Suspense>
     );
 }

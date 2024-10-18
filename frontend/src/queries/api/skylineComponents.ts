@@ -87,51 +87,6 @@ export const useStartImport = (
     });
 };
 
-export type GetModelPathParams = {
-    user: string;
-    year: number;
-};
-
-export type GetModelError = Fetcher.ErrorWrapper<{
-    status: 422;
-    payload: Schemas.HTTPValidationError;
-}>;
-
-export type GetModelVariables = {
-    pathParams: GetModelPathParams;
-} & SkylineContext['fetcherOptions'];
-
-/**
- * Retrieve the contributions model for a given user and year.
- */
-export const fetchGetModel = (variables: GetModelVariables, signal?: AbortSignal) =>
-    skylineFetch<void, GetModelError, undefined, {}, {}, GetModelPathParams>({
-        url: '/contributions/model/{user}/{year}',
-        method: 'get',
-        ...variables,
-        signal,
-    });
-
-/**
- * Retrieve the contributions model for a given user and year.
- */
-export const useGetModel = <TData = void>(
-    variables: GetModelVariables,
-    options?: Omit<reactQuery.UseQueryOptions<void, GetModelError, TData>, 'queryKey' | 'queryFn' | 'initialData'>,
-) => {
-    const { fetcherOptions, queryOptions, queryKeyFn } = useSkylineContext(options);
-    return reactQuery.useQuery<void, GetModelError, TData>({
-        queryKey: queryKeyFn({
-            path: '/contributions/model/{user}/{year}',
-            operationId: 'getModel',
-            variables,
-        }),
-        queryFn: ({ signal }) => fetchGetModel({ ...fetcherOptions, ...variables }, signal),
-        ...options,
-        ...queryOptions,
-    });
-};
-
 export type GetYearsError = Fetcher.ErrorWrapper<undefined>;
 
 export type GetYearsResponse = number[];
@@ -177,11 +132,6 @@ export type QueryOperation =
           path: '/auth/me';
           operationId: 'getCurrentUser';
           variables: GetCurrentUserVariables;
-      }
-    | {
-          path: '/contributions/model/{user}/{year}';
-          operationId: 'getModel';
-          variables: GetModelVariables;
       }
     | {
           path: '/contributions/years';
