@@ -156,7 +156,7 @@ export function HomeRoute() {
 
     return user ? (
         <div className="flex h-dvh w-dvw flex-col">
-            <div className="flex-1">{selectedYear && <Viewer year={selectedYear} />}</div>
+            <div className="min-h-0 flex-1">{selectedYear && <Viewer year={selectedYear} />}</div>
             <BottomBar selectedYear={selectedYear} setSelectedYear={setSelectedYear} />
         </div>
     ) : (
