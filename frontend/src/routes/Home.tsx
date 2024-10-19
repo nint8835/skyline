@@ -145,11 +145,13 @@ function BottomBar() {
 }
 
 export function HomeRoute() {
-    const { user, selectedYear } = useStore();
+    const { user } = useStore();
 
     return user ? (
         <div className="flex h-dvh w-dvw flex-col">
-            <div className="min-h-0 flex-1">{selectedYear && <Viewer />}</div>
+            <div className="min-h-0 flex-1">
+                <Viewer />
+            </div>
             <BottomBar />
         </div>
     ) : (
