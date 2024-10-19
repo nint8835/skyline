@@ -58,7 +58,7 @@ function BottomBar({
 
     if (yearsPending || importPending || availableYears === undefined) {
         return (
-            <div className="flex h-fit flex-col items-center bg-zinc-800 p-4 md:grid-cols-2">
+            <div className="flex h-56 flex-col items-center justify-center bg-zinc-800 md:grid-cols-2">
                 <div className="h-24 w-24 animate-spin rounded-full border-r-2 border-emerald-500"></div>
             </div>
         );
