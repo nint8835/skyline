@@ -2,7 +2,7 @@ import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { cn } from '@/lib/util';
+import { cn, onQueryError } from '@/lib/util';
 import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
 import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
@@ -24,8 +24,10 @@ function LoginPrompt() {
 }
 
 function BottomBar() {
-    const { data: availableYears, isPending: yearsPending } = useGetYears({});
-    const { mutateAsync: importYear, isPending: importPending } = useStartImport();
+    const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
+    const { mutateAsync: importYear, isPending: importPending } = useStartImport({
+        onError: onQueryError,
+    });
     const { user, selectedYear, setSelectedYear } = useStore();
 
     // Tooltip hooks
@@ -50,7 +52,7 @@ function BottomBar() {
 
     if (yearsPending || importPending || availableYears === undefined) {
         return (
-            <div className="flex h-fit flex-col items-center bg-zinc-800 p-4 md:grid-cols-2">
+            <div className="flex h-56 flex-col items-center justify-center bg-zinc-800 md:grid-cols-2">
                 <div className="h-24 w-24 animate-spin rounded-full border-r-2 border-emerald-500"></div>
             </div>
         );
@@ -122,7 +124,7 @@ function BottomBar() {
                         <Input
                             className="flex-1 rounded-md bg-zinc-900 p-4"
                             type="number"
-                            min={2007}
+                            min={2005}
                             max={new Date().getFullYear() - 1}
                             value={importYearSelection || ''}
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -143,13 +145,11 @@ function BottomBar() {
 }
 
 export function HomeRoute() {
-    const { user } = useStore();
+    const { user, selectedYear } = useStore();
 
     return user ? (
         <div className="flex h-dvh w-dvw flex-col">
-            <div className="flex-1">
-                <Viewer />
-            </div>
+            <div className="min-h-0 flex-1">{selectedYear && <Viewer />}</div>
             <BottomBar />
         </div>
     ) : (

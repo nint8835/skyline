@@ -1,6 +1,8 @@
+from datetime import datetime, timezone
 from typing import Annotated, Any, Sequence
 
 from fastapi import APIRouter, Depends, Path, Response, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +14,7 @@ from skyline.models.contribution_data import (
     ContributionImporter,
     Contributions,
 )
+from skyline.schemas import ErrorResponseSchema
 from skyline.tasks.importing import import_contributions
 
 contributions_router = APIRouter(tags=["Contributions"])
@@ -21,8 +24,18 @@ contributions_router = APIRouter(tags=["Contributions"])
     "/import/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
-        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthenticated"},
-        status.HTTP_409_CONFLICT: {"description": "Contributions Already Imported"},
+        status.HTTP_400_BAD_REQUEST: {
+            "description": "Invalid Year",
+            "model": ErrorResponseSchema,
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            "description": "Unauthenticated",
+            "model": ErrorResponseSchema,
+        },
+        status.HTTP_409_CONFLICT: {
+            "description": "Contributions Already Imported",
+            "model": ErrorResponseSchema,
+        },
     },
 )
 async def start_import(
@@ -32,6 +45,15 @@ async def start_import(
     db: AsyncSession = Depends(get_db),
 ):
     """Import contributions for the current user."""
+
+    if year >= datetime.now(timezone.utc).year or year < 2005:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponseSchema(
+                detail="Invalid year. Year must be greater than or equal to 2005, and less than the current year."
+            ).model_dump(),
+        )
+
     async with db.begin():
         is_imported = (
             await db.execute(
@@ -39,7 +61,12 @@ async def start_import(
             )
         ).scalar_one_or_none()
         if is_imported:
-            return Response(status_code=status.HTTP_409_CONFLICT)
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content=ErrorResponseSchema(
+                    detail="Contributions already imported."
+                ).model_dump(),
+            )
 
     await import_contributions(user, year, token, db)
 

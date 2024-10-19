@@ -5,6 +5,8 @@ import { HomeRoute } from '@/routes/Home';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { ErrorPage } from './routes/Error';
 
 const router = createBrowserRouter([
     {
@@ -15,6 +17,7 @@ const router = createBrowserRouter([
 
             return currentUser;
         },
+        errorElement: <ErrorPage />,
         children: [
             {
                 index: true,
@@ -29,6 +32,7 @@ export function App() {
         <QueryClientProvider client={queryClient}>
             <RouterProvider router={router} />
             <ReactQueryDevtools initialIsOpen={false} />
+            <Toaster richColors />
         </QueryClientProvider>
     );
 }
