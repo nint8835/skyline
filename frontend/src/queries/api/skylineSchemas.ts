@@ -3,6 +3,16 @@
  *
  * @version 0.1.0
  */
+/**
+ * A generic error response.
+ */
+export type ErrorResponseSchema = {
+    /**
+     * A description of the error.
+     */
+    detail: string;
+};
+
 export type HTTPValidationError = {
     detail?: ValidationError[];
 };

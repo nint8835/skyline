@@ -54,10 +54,24 @@ export type StartImportPathParams = {
     year: number;
 };
 
-export type StartImportError = Fetcher.ErrorWrapper<{
-    status: 422;
-    payload: Schemas.HTTPValidationError;
-}>;
+export type StartImportError = Fetcher.ErrorWrapper<
+    | {
+          status: 400;
+          payload: Schemas.ErrorResponseSchema;
+      }
+    | {
+          status: 401;
+          payload: Schemas.ErrorResponseSchema;
+      }
+    | {
+          status: 409;
+          payload: Schemas.ErrorResponseSchema;
+      }
+    | {
+          status: 422;
+          payload: Schemas.HTTPValidationError;
+      }
+>;
 
 export type StartImportVariables = {
     pathParams: StartImportPathParams;

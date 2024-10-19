@@ -128,7 +128,7 @@ function BottomBar({
                         <Input
                             className="flex-1 rounded-md bg-zinc-900 p-4"
                             type="number"
-                            min={2007}
+                            min={2005}
                             max={new Date().getFullYear() - 1}
                             value={importYearSelection || ''}
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
