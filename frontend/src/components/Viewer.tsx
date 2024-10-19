@@ -30,13 +30,7 @@ function Model() {
 
     return (
         <group ref={groupRef}>
-            <mesh
-                geometry={stl}
-                castShadow
-                receiveShadow
-                rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
-                position={[-78, 0, 0]}
-            >
+            <mesh geometry={stl} castShadow receiveShadow rotation={[-Math.PI / 2, 0, -Math.PI / 2]}>
                 <meshStandardMaterial />
             </mesh>
             <CameraControls ref={camControlsRef} makeDefault />

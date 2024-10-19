@@ -11,8 +11,8 @@ def skyline_model(days: Sequence[int | None]) -> bytes:
     grid = cadquery.Assembly()
 
     for index, count in enumerate(days):
-        col_offset = GRID_SQUARE_SIZE * (index // 7)
-        row_offset = GRID_SQUARE_SIZE * (index % 7)
+        col_offset = (-GRID_SQUARE_SIZE * 52 / 2) + GRID_SQUARE_SIZE * (index // 7)
+        row_offset = (-GRID_SQUARE_SIZE * 7 / 2) + GRID_SQUARE_SIZE * (index % 7)
 
         if count is None:
             continue
