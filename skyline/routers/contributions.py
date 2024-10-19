@@ -85,6 +85,20 @@ async def get_model(
     )
 
 
+@contributions_router.get("/blank-model", include_in_schema=False)
+async def get_blank_model() -> Response:
+    """Retrieve a blank contributions model."""
+    model = skyline_model([0] * 7 * 52)
+
+    return Response(
+        model,
+        headers={
+            "Content-Type": "model/stl",
+            "Content-Disposition": "attachment; filename=blank.stl",
+        },
+    )
+
+
 @contributions_router.get("/years")
 async def get_years(
     user: str = Depends(require_user),

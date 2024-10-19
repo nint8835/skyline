@@ -23,16 +23,10 @@ function LoginPrompt() {
     );
 }
 
-function BottomBar({
-    selectedYear,
-    setSelectedYear,
-}: {
-    selectedYear: number | undefined;
-    setSelectedYear: (year: number | undefined) => void;
-}) {
+function BottomBar() {
     const { data: availableYears, isPending: yearsPending } = useGetYears({});
     const { mutateAsync: importYear, isPending: importPending } = useStartImport();
-    const { user } = useStore();
+    const { user, selectedYear, setSelectedYear } = useStore();
 
     // Tooltip hooks
     const [importExplanationTooltipOpen, setImportExplanationTooltipOpen] = useState(false);
@@ -150,12 +144,13 @@ function BottomBar({
 
 export function HomeRoute() {
     const { user } = useStore();
-    const [selectedYear, setSelectedYear] = useState<number | undefined>();
 
     return user ? (
         <div className="flex h-dvh w-dvw flex-col">
-            <div className="flex-1">{selectedYear && <Viewer year={selectedYear} />}</div>
-            <BottomBar selectedYear={selectedYear} setSelectedYear={setSelectedYear} />
+            <div className="flex-1">
+                <Viewer />
+            </div>
+            <BottomBar />
         </div>
     ) : (
         <LoginPrompt />
