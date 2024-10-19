@@ -2,7 +2,7 @@ import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { cn } from '@/lib/util';
+import { cn, onQueryError } from '@/lib/util';
 import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
 import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
@@ -30,8 +30,10 @@ function BottomBar({
     selectedYear: number | undefined;
     setSelectedYear: (year: number | undefined) => void;
 }) {
-    const { data: availableYears, isPending: yearsPending } = useGetYears({});
-    const { mutateAsync: importYear, isPending: importPending } = useStartImport();
+    const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
+    const { mutateAsync: importYear, isPending: importPending } = useStartImport({
+        onError: onQueryError,
+    });
     const { user } = useStore();
 
     // Tooltip hooks
