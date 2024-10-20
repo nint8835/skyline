@@ -2,7 +2,7 @@ import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { cn, onQueryError } from '@/lib/util';
+import { cn, getModelUrl, onQueryError } from '@/lib/util';
 import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
 import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
@@ -34,7 +34,6 @@ function BottomBar({
     const { mutateAsync: importYear, isPending: importPending } = useStartImport({
         onError: onQueryError,
     });
-    const { user } = useStore();
 
     // Tooltip hooks
     const [importExplanationTooltipOpen, setImportExplanationTooltipOpen] = useState(false);
@@ -106,7 +105,7 @@ function BottomBar({
                                     'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
                                     !selectedYear && 'pointer-events-none opacity-50',
                                 )}
-                                href={`/contributions/model/${user}/${selectedYear}`}
+                                href={getModelUrl({ year: selectedYear || 0 })}
                             >
                                 Download
                             </a>

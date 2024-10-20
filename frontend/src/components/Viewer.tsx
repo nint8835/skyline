@@ -1,3 +1,4 @@
+import { getModelUrl } from '@/lib/util';
 import { Bounds, Center, OrbitControls } from '@react-three/drei';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { Suspense } from 'react';
@@ -12,7 +13,7 @@ function LoadingIndicator() {
 }
 
 function ViewerCanvas({ year }: { year: number }) {
-    const stl = useLoader(STLLoader, `/contributions/model/${year}`);
+    const stl = useLoader(STLLoader, getModelUrl({ year }));
 
     return (
         <Canvas shadows>

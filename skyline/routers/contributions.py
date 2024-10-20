@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Annotated, Any, Sequence
 
-from fastapi import APIRouter, Depends, Path, Response, status
+from fastapi import APIRouter, Depends, Path, Query, Response, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +15,7 @@ from skyline.models.contribution_data import (
     Contributions,
 )
 from skyline.schemas import ErrorResponseSchema
+from skyline.schemas.contributions import ModelContributionSelection
 from skyline.tasks.importing import import_contributions
 
 contributions_router = APIRouter(tags=["Contributions"])
@@ -73,30 +74,59 @@ async def start_import(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@contributions_router.get("/model/{year}", include_in_schema=False)
+@contributions_router.get("/model/{year}")
 async def get_model(
     year: int,
     user: str = Depends(require_user),
     db: AsyncSession = Depends(get_db),
+    contribution_selection: Annotated[
+        ModelContributionSelection, Query(alias="contributions")
+    ] = ModelContributionSelection.All,
 ):
     """Retrieve the contributions model for a given user and year."""
     async with db.begin():
-        contribution_data = (
+        user_contribution_data = (
             await db.execute(
                 select(ContributionData).filter_by(
                     user=user, year=year, importer=ContributionImporter.User
                 )
             )
         ).scalar_one_or_none()
+        bot_contribution_data = (
+            await db.execute(
+                select(ContributionData).filter_by(
+                    user=user, year=year, importer=ContributionImporter.Bot
+                )
+            )
+        ).scalar_one_or_none()
 
-    if not contribution_data:
+    if not user_contribution_data or not bot_contribution_data:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
-    contributions = Contributions.model_validate_json(contribution_data.contributions)
-    days = list(contributions.root.values())
+    user_contributions = Contributions.model_validate_json(
+        user_contribution_data.contributions
+    )
+    bot_contributions = Contributions.model_validate_json(
+        bot_contribution_data.contributions
+    )
+
+    contributions = {}
+
+    match contribution_selection:
+        case ModelContributionSelection.All:
+            contributions = bot_contributions.root
+        case ModelContributionSelection.Personal:
+            contributions = user_contributions.root
+        case ModelContributionSelection.Work:
+            for day in bot_contributions.root:
+                contributions[day] = (
+                    bot_contributions.root[day] - user_contributions.root[day]
+                )
+
+    days = list(contributions.values())
 
     # Pad the first week with None values to ensure the model is appropriately offset
-    first_day = list(contributions.root.keys())[0]
+    first_day = list(contributions.keys())[0]
     weekday_number = first_day.isoweekday()
     missing_days = weekday_number % 7
     days = [None] * missing_days + days
