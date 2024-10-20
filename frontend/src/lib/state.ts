@@ -1,12 +1,16 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { type ModelConfiguration } from './util';
 
 interface State {
     user: string | null;
     setUser: (user: string | null) => void;
 
-    selectedYear: number | undefined;
-    setSelectedYear: (year: number | undefined) => void;
+    modelOptions: ModelConfiguration;
+
+    modelOptionsSetters: {
+        setYear: (year: number) => void;
+    };
 }
 
 export const useStore = create<State>()(
@@ -14,7 +18,11 @@ export const useStore = create<State>()(
         user: null,
         setUser: (user) => set({ user }, undefined, 'setUser'),
 
-        selectedYear: undefined,
-        setSelectedYear: (selectedYear) => set({ selectedYear }, undefined, 'setSelectedYear'),
+        modelOptions: {
+            year: 0,
+        },
+        modelOptionsSetters: {
+            setYear: (year) => set({ modelOptions: { year } }, undefined, 'setYear'),
+        },
     })),
 );

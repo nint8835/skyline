@@ -17,6 +17,8 @@ export type HTTPValidationError = {
     detail?: ValidationError[];
 };
 
+export type ModelContributionSelection = 'all' | 'personal' | 'work';
+
 export type ValidationError = {
     loc: (string | number)[];
     msg: string;

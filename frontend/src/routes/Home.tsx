@@ -2,7 +2,7 @@ import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { cn, onQueryError } from '@/lib/util';
+import { cn, getModelUrl, onQueryError } from '@/lib/util';
 import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
 import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
 import { Button, Field, Input, Label, Select } from '@headlessui/react';
@@ -24,11 +24,15 @@ function LoginPrompt() {
 }
 
 function BottomBar() {
+    const {
+        modelOptions,
+        modelOptionsSetters: { setYear },
+    } = useStore();
+
     const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
     const { mutateAsync: importYear, isPending: importPending } = useStartImport({
         onError: onQueryError,
     });
-    const { user, selectedYear, setSelectedYear } = useStore();
 
     // Tooltip hooks
     const [importExplanationTooltipOpen, setImportExplanationTooltipOpen] = useState(false);
@@ -65,7 +69,7 @@ function BottomBar() {
 
         await importYear({ pathParams: { year: importYearSelection } });
         queryClient.invalidateQueries({ queryKey: ['contributions', 'years'] });
-        setSelectedYear(importYearSelection);
+        setYear(importYearSelection);
         setImportYearSelection(null);
     }
 
@@ -83,9 +87,9 @@ function BottomBar() {
                         <div className="flex gap-2">
                             <Select
                                 className="flex-1 rounded-md bg-zinc-900 p-4"
-                                value={selectedYear}
+                                value={modelOptions.year}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                                    setSelectedYear(parseInt(e.target.value, 10) || undefined)
+                                    setYear(parseInt(e.target.value, 10) || 0)
                                 }
                             >
                                 <option>Select a year</option>
@@ -98,9 +102,9 @@ function BottomBar() {
                             <a
                                 className={cn(
                                     'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
-                                    !selectedYear && 'pointer-events-none opacity-50',
+                                    !modelOptions.year && 'pointer-events-none opacity-50',
                                 )}
-                                href={`/contributions/model/${user}/${selectedYear}`}
+                                href={getModelUrl(modelOptions)}
                             >
                                 Download
                             </a>

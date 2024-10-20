@@ -1,4 +1,5 @@
 import { useStore } from '@/lib/state';
+import { getModelUrl } from '@/lib/util';
 import { CameraControls, Environment } from '@react-three/drei';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { Suspense, useEffect, useRef } from 'react';
@@ -14,8 +15,8 @@ function LoadingIndicator() {
 }
 
 function Model() {
-    const { selectedYear } = useStore();
-    const modelUrl = selectedYear ? `/contributions/model/${selectedYear}` : '/blank.stl';
+    const modelOptions = useStore((state) => state.modelOptions);
+    const modelUrl = getModelUrl(modelOptions);
     const stl = useLoader(STLLoader, modelUrl);
     const camControlsRef = useRef<CameraControls>(null);
     const groupRef = useRef<Group>(null);
