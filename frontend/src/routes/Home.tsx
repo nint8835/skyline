@@ -23,13 +23,12 @@ function LoginPrompt() {
     );
 }
 
-function BottomBar({
-    selectedYear,
-    setSelectedYear,
-}: {
-    selectedYear: number | undefined;
-    setSelectedYear: (year: number | undefined) => void;
-}) {
+function BottomBar() {
+    const {
+        modelOptions,
+        modelOptionsSetters: { setYear },
+    } = useStore();
+
     const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
     const { mutateAsync: importYear, isPending: importPending } = useStartImport({
         onError: onQueryError,
@@ -70,7 +69,7 @@ function BottomBar({
 
         await importYear({ pathParams: { year: importYearSelection } });
         queryClient.invalidateQueries({ queryKey: ['contributions', 'years'] });
-        setSelectedYear(importYearSelection);
+        setYear(importYearSelection);
         setImportYearSelection(null);
     }
 
@@ -88,9 +87,9 @@ function BottomBar({
                         <div className="flex gap-2">
                             <Select
                                 className="flex-1 rounded-md bg-zinc-900 p-4"
-                                value={selectedYear}
+                                value={modelOptions.year}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                                    setSelectedYear(parseInt(e.target.value, 10) || undefined)
+                                    setYear(parseInt(e.target.value, 10) || 0)
                                 }
                             >
                                 <option>Select a year</option>
@@ -103,9 +102,9 @@ function BottomBar({
                             <a
                                 className={cn(
                                     'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
-                                    !selectedYear && 'pointer-events-none opacity-50',
+                                    !modelOptions.year && 'pointer-events-none opacity-50',
                                 )}
-                                href={getModelUrl({ year: selectedYear || 0 })}
+                                href={getModelUrl(modelOptions)}
                             >
                                 Download
                             </a>
@@ -151,12 +150,12 @@ function BottomBar({
 
 export function HomeRoute() {
     const { user } = useStore();
-    const [selectedYear, setSelectedYear] = useState<number | undefined>();
+    const year = useStore((state) => state.modelOptions.year);
 
     return user ? (
         <div className="flex h-dvh w-dvw flex-col">
-            <div className="min-h-0 flex-1">{selectedYear && <Viewer year={selectedYear} />}</div>
-            <BottomBar selectedYear={selectedYear} setSelectedYear={setSelectedYear} />
+            <div className="min-h-0 flex-1">{(year || null) && <Viewer />}</div>
+            <BottomBar />
         </div>
     ) : (
         <LoginPrompt />

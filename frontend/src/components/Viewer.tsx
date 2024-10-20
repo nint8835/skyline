@@ -1,3 +1,4 @@
+import { useStore } from '@/lib/state';
 import { getModelUrl } from '@/lib/util';
 import { Bounds, Center, OrbitControls } from '@react-three/drei';
 import { Canvas, useLoader } from '@react-three/fiber';
@@ -12,8 +13,10 @@ function LoadingIndicator() {
     );
 }
 
-function ViewerCanvas({ year }: { year: number }) {
-    const stl = useLoader(STLLoader, getModelUrl({ year }));
+function ViewerCanvas() {
+    const options = useStore((state) => state.modelOptions);
+
+    const stl = useLoader(STLLoader, getModelUrl(options));
 
     return (
         <Canvas shadows>
@@ -31,10 +34,10 @@ function ViewerCanvas({ year }: { year: number }) {
     );
 }
 
-export function Viewer({ year }: { year: number }) {
+export function Viewer() {
     return (
         <Suspense fallback={<LoadingIndicator />}>
-            <ViewerCanvas year={year} />
+            <ViewerCanvas />
         </Suspense>
     );
 }
