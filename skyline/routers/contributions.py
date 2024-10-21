@@ -162,4 +162,34 @@ async def get_years(
     return years
 
 
+@contributions_router.get("/work-contributions-available/{year}")
+async def work_contributions_available(
+    year: int, user: str = Depends(require_user), db: AsyncSession = Depends(get_db)
+) -> bool:
+    """Get whether or not work contributions are available for the user for."""
+    async with db.begin():
+        user_contribution_data = (
+            await db.execute(
+                select(ContributionData).filter_by(
+                    user=user, year=year, importer=ContributionImporter.User
+                )
+            )
+        ).scalar_one_or_none()
+        bot_contribution_data = (
+            await db.execute(
+                select(ContributionData).filter_by(
+                    user=user, year=year, importer=ContributionImporter.Bot
+                )
+            )
+        ).scalar_one_or_none()
+
+    if not user_contribution_data or not bot_contribution_data:
+        return False
+
+    return (
+        Contributions.model_validate_json(bot_contribution_data.contributions).root
+        != Contributions.model_validate_json(user_contribution_data.contributions).root
+    )
+
+
 __all__ = ["contributions_router"]

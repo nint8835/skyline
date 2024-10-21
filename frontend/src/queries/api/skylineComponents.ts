@@ -193,6 +193,53 @@ export const useGetYears = <TData = GetYearsResponse>(
     });
 };
 
+export type WorkContributionsAvailablePathParams = {
+    year: number;
+};
+
+export type WorkContributionsAvailableError = Fetcher.ErrorWrapper<{
+    status: 422;
+    payload: Schemas.HTTPValidationError;
+}>;
+
+export type WorkContributionsAvailableVariables = {
+    pathParams: WorkContributionsAvailablePathParams;
+} & SkylineContext['fetcherOptions'];
+
+/**
+ * Get whether or not work contributions are available for the user for.
+ */
+export const fetchWorkContributionsAvailable = (variables: WorkContributionsAvailableVariables, signal?: AbortSignal) =>
+    skylineFetch<boolean, WorkContributionsAvailableError, undefined, {}, {}, WorkContributionsAvailablePathParams>({
+        url: '/contributions/work-contributions-available/{year}',
+        method: 'get',
+        ...variables,
+        signal,
+    });
+
+/**
+ * Get whether or not work contributions are available for the user for.
+ */
+export const useWorkContributionsAvailable = <TData = boolean>(
+    variables: WorkContributionsAvailableVariables,
+    options?: Omit<
+        reactQuery.UseQueryOptions<boolean, WorkContributionsAvailableError, TData>,
+        'queryKey' | 'queryFn' | 'initialData'
+    >,
+) => {
+    const { fetcherOptions, queryOptions, queryKeyFn } = useSkylineContext(options);
+    return reactQuery.useQuery<boolean, WorkContributionsAvailableError, TData>({
+        queryKey: queryKeyFn({
+            path: '/contributions/work-contributions-available/{year}',
+            operationId: 'workContributionsAvailable',
+            variables,
+        }),
+        queryFn: ({ signal }) => fetchWorkContributionsAvailable({ ...fetcherOptions, ...variables }, signal),
+        ...options,
+        ...queryOptions,
+    });
+};
+
 export type QueryOperation =
     | {
           path: '/auth/me';
@@ -208,4 +255,9 @@ export type QueryOperation =
           path: '/contributions/years';
           operationId: 'getYears';
           variables: GetYearsVariables;
+      }
+    | {
+          path: '/contributions/work-contributions-available/{year}';
+          operationId: 'workContributionsAvailable';
+          variables: WorkContributionsAvailableVariables;
       };

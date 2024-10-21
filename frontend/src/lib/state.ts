@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 import { type ModelConfiguration } from './util';
 
 interface State {
@@ -10,19 +11,48 @@ interface State {
 
     modelOptionsSetters: {
         setYear: (year: number) => void;
+        setContributions: (contributions: ModelConfiguration['contributions']) => void;
     };
 }
 
 export const useStore = create<State>()(
-    devtools((set) => ({
-        user: null,
-        setUser: (user) => set({ user }, undefined, 'setUser'),
+    devtools(
+        immer((set) => ({
+            user: null,
+            setUser: (user) => {
+                set(
+                    (state) => {
+                        state.user = user;
+                    },
+                    undefined,
+                    'setUser',
+                );
+            },
 
-        modelOptions: {
-            year: 0,
-        },
-        modelOptionsSetters: {
-            setYear: (year) => set({ modelOptions: { year } }, undefined, 'setYear'),
-        },
-    })),
+            modelOptions: {
+                year: 0,
+                contributions: 'all',
+            },
+            modelOptionsSetters: {
+                setYear: (year) => {
+                    set(
+                        (state) => {
+                            state.modelOptions.year = year;
+                        },
+                        undefined,
+                        'setYear',
+                    );
+                },
+                setContributions: (contributions) => {
+                    set(
+                        (state) => {
+                            state.modelOptions.contributions = contributions;
+                        },
+                        undefined,
+                        'setContributions',
+                    );
+                },
+            },
+        })),
+    ),
 );

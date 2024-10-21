@@ -2,11 +2,12 @@ import { Viewer } from '@/components/Viewer';
 import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { cn, getModelUrl, onQueryError } from '@/lib/util';
-import { useGetYears, useStartImport } from '@/queries/api/skylineComponents';
+import { cn, getModelUrl, ModelConfiguration, onQueryError } from '@/lib/util';
+import { useGetYears, useStartImport, useWorkContributionsAvailable } from '@/queries/api/skylineComponents';
 import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
-import { Button, Field, Input, Label, Select } from '@headlessui/react';
-import { type ChangeEvent, useState } from 'react';
+import { Button, Field, Input, Label, Radio, RadioGroup, Select } from '@headlessui/react';
+import { Circle, CircleCheckBig } from 'lucide-react';
+import { type ChangeEvent, useEffect, useState } from 'react';
 
 function LoginPrompt() {
     return (
@@ -23,13 +24,77 @@ function LoginPrompt() {
     );
 }
 
+function ContributionOptionRadioButton({
+    option,
+    displayName,
+    workAvailable,
+}: {
+    option: ModelConfiguration['contributions'];
+    displayName: string;
+    workAvailable: boolean | undefined;
+}) {
+    const [disabledTooltipOpen, setDisabledTooltipOpen] = useState(false);
+    const {
+        refs: disabledTooltipRefs,
+        floatingStyles: disabledTooltipStyles,
+        context: disabledTooltipContext,
+    } = useFloating({
+        open: disabledTooltipOpen,
+        onOpenChange: setDisabledTooltipOpen,
+    });
+    const { isMounted: disabledTooltipIsMounted, styles: disabledTooltipTransitionStyles } =
+        useTransitionStyles(disabledTooltipContext);
+    const disabledTooltipHover = useHover(disabledTooltipContext);
+    const { getReferenceProps: disabledTooltipGetReferenceProps, getFloatingProps: disabledTooltipGetFloatingProps } =
+        useInteractions([disabledTooltipHover]);
+
+    const optionUnavailable = option !== 'all' && !workAvailable;
+
+    return (
+        <>
+            <div ref={disabledTooltipRefs.setReference} {...disabledTooltipGetReferenceProps()}>
+                <Field
+                    disabled={optionUnavailable}
+                    className="flex cursor-pointer flex-row gap-2 transition-all hover:text-zinc-400 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:text-zinc-50"
+                >
+                    <Radio value={option}>
+                        {({ checked }) => {
+                            const className = '';
+                            return checked ? (
+                                <CircleCheckBig className={className} />
+                            ) : (
+                                <Circle className={className} />
+                            );
+                        }}
+                    </Radio>
+                    <Label className="transition-all">{displayName}</Label>
+                </Field>
+            </div>
+            {disabledTooltipIsMounted && optionUnavailable && (
+                <div
+                    ref={disabledTooltipRefs.setFloating}
+                    style={{ ...disabledTooltipStyles, ...disabledTooltipTransitionStyles }}
+                    {...disabledTooltipGetFloatingProps()}
+                >
+                    <p className="max-w-prose rounded-md bg-zinc-700 p-2">
+                        No work contributions available for this year.
+                        {/* TODO: Document what work contributions are, and link to this explanation */}
+                    </p>
+                </div>
+            )}
+        </>
+    );
+}
+
 function BottomBar() {
     const {
         modelOptions,
-        modelOptionsSetters: { setYear },
+        modelOptionsSetters: { setYear, setContributions },
     } = useStore();
 
     const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
+    const { data: workContributionsAvailable, isPending: workContributionsAvailablePending } =
+        useWorkContributionsAvailable({ pathParams: { year: modelOptions.year } }, { throwOnError: true });
     const { mutateAsync: importYear, isPending: importPending } = useStartImport({
         onError: onQueryError,
     });
@@ -53,6 +118,12 @@ function BottomBar() {
     } = useInteractions([importExplanationTooltipHover]);
 
     const [importYearSelection, setImportYearSelection] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (!workContributionsAvailable && !workContributionsAvailablePending && modelOptions.contributions !== 'all') {
+            setContributions('all');
+        }
+    }, [setContributions, workContributionsAvailable, modelOptions.contributions, workContributionsAvailablePending]);
 
     if (yearsPending || importPending || availableYears === undefined) {
         return (
@@ -110,6 +181,27 @@ function BottomBar() {
                             </a>
                         </div>
                     </Field>
+                    <RadioGroup
+                        value={modelOptions.contributions}
+                        onChange={setContributions}
+                        className="mt-2 flex flex-row justify-around"
+                    >
+                        <ContributionOptionRadioButton
+                            option="all"
+                            displayName="All"
+                            workAvailable={workContributionsAvailable}
+                        />
+                        <ContributionOptionRadioButton
+                            option="personal"
+                            displayName="Personal"
+                            workAvailable={workContributionsAvailable}
+                        />
+                        <ContributionOptionRadioButton
+                            option="work"
+                            displayName="Work"
+                            workAvailable={workContributionsAvailable}
+                        />
+                    </RadioGroup>
                 </div>
                 {importExplanationTooltipIsMounted && !availableYears.length && (
                     <div
