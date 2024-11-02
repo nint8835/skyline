@@ -138,12 +138,12 @@ function LabelCheckBox() {
 function BottomBar() {
     const {
         modelOptions,
-        modelOptionsSetters: { setYear, setContributions },
+        modelOptionsSetters: { setStartYear, setContributions },
     } = useStore();
 
     const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
     const { data: workContributionsAvailable, isPending: workContributionsAvailablePending } =
-        useWorkContributionsAvailable({ pathParams: { year: modelOptions.year } }, { throwOnError: true });
+        useWorkContributionsAvailable({ pathParams: { year: modelOptions.start_year } }, { throwOnError: true });
     const { mutateAsync: importYear, isPending: importPending } = useStartImport({
         onError: onQueryError,
     });
@@ -189,7 +189,7 @@ function BottomBar() {
 
         await importYear({ pathParams: { year: importYearSelection } });
         queryClient.invalidateQueries({ queryKey: ['contributions', 'years'] });
-        setYear(importYearSelection);
+        setStartYear(importYearSelection);
         setImportYearSelection(null);
     }
 
@@ -207,9 +207,9 @@ function BottomBar() {
                         <div className="flex gap-2">
                             <Select
                                 className="flex-1 rounded-md bg-zinc-900 p-4"
-                                value={modelOptions.year}
+                                value={modelOptions.start_year}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                                    setYear(parseInt(e.target.value, 10) || 0)
+                                    setStartYear(parseInt(e.target.value, 10) || 0)
                                 }
                             >
                                 <option>Select a year</option>
@@ -222,7 +222,7 @@ function BottomBar() {
                             <a
                                 className={cn(
                                     'flex w-1/3 justify-center rounded-md bg-emerald-600 p-4 transition-all hover:bg-emerald-700',
-                                    !modelOptions.year && 'pointer-events-none opacity-50',
+                                    !modelOptions.start_year && 'pointer-events-none opacity-50',
                                 )}
                                 href={getModelUrl(modelOptions)}
                             >
@@ -292,7 +292,7 @@ function BottomBar() {
 
 export function HomeRoute() {
     const { user } = useStore();
-    const year = useStore((state) => state.modelOptions.year);
+    const year = useStore((state) => state.modelOptions.start_year);
 
     return user ? (
         <div className="flex h-dvh w-dvw flex-col">

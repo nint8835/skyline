@@ -101,11 +101,15 @@ export const useStartImport = (
     });
 };
 
-export type GetModelPathParams = {
-    year: number;
-};
-
 export type GetModelQueryParams = {
+    /**
+     * The start year for the model.
+     */
+    start_year: number;
+    /**
+     * The end year for the model.
+     */
+    end_year?: number | null;
     /**
      * @default all
      */
@@ -122,16 +126,15 @@ export type GetModelError = Fetcher.ErrorWrapper<{
 }>;
 
 export type GetModelVariables = {
-    pathParams: GetModelPathParams;
-    queryParams?: GetModelQueryParams;
+    queryParams: GetModelQueryParams;
 } & SkylineContext['fetcherOptions'];
 
 /**
  * Retrieve the contributions model for a given user and year.
  */
 export const fetchGetModel = (variables: GetModelVariables, signal?: AbortSignal) =>
-    skylineFetch<void, GetModelError, undefined, {}, GetModelQueryParams, GetModelPathParams>({
-        url: '/contributions/model/{year}',
+    skylineFetch<void, GetModelError, undefined, {}, GetModelQueryParams, {}>({
+        url: '/contributions/model',
         method: 'get',
         ...variables,
         signal,
@@ -147,7 +150,7 @@ export const useGetModel = <TData = void>(
     const { fetcherOptions, queryOptions, queryKeyFn } = useSkylineContext(options);
     return reactQuery.useQuery<void, GetModelError, TData>({
         queryKey: queryKeyFn({
-            path: '/contributions/model/{year}',
+            path: '/contributions/model',
             operationId: 'getModel',
             variables,
         }),
@@ -251,7 +254,7 @@ export type QueryOperation =
           variables: GetCurrentUserVariables;
       }
     | {
-          path: '/contributions/model/{year}';
+          path: '/contributions/model';
           operationId: 'getModel';
           variables: GetModelVariables;
       }

@@ -10,7 +10,7 @@ interface State {
     modelOptions: ModelConfiguration;
 
     modelOptionsSetters: {
-        setYear: (year: number) => void;
+        setStartYear: (year: number) => void;
         setContributions: (contributions: ModelConfiguration['contributions']) => void;
         setIncludeLabels: (includeLabels: boolean) => void;
     };
@@ -31,17 +31,17 @@ export const useStore = create<State>()(
             },
 
             modelOptions: {
-                year: 0,
+                start_year: 0,
                 contributions: 'all',
             },
             modelOptionsSetters: {
-                setYear: (year) => {
+                setStartYear: (year) => {
                     set(
                         (state) => {
-                            state.modelOptions.year = year;
+                            state.modelOptions.start_year = year;
                         },
                         undefined,
-                        'setYear',
+                        'setStartYear',
                     );
                 },
                 setContributions: (contributions) => {
