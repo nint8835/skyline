@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build Docker image
 
 on:
     push:
@@ -11,20 +11,6 @@ permissions:
 
 jobs:
     build:
-        name: Build Docker Image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-            - uses: earthly/actions-setup@v1
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  version: 'latest'
-            - name: Log into registry
-              uses: docker/login-action@v3
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Push to GitHub Packages
-              run: earthly --ci --push +app
+        uses: nint8835/workflows/.github/workflows/earthly-build.yaml@main
+        with:
+            target: +app
