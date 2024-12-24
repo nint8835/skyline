@@ -1,4 +1,5 @@
 import tempfile
+from pathlib import Path
 from typing import Sequence, cast
 
 import cadquery
@@ -37,7 +38,12 @@ def skyline_model(*, days: Sequence[int | None], label: str | None = "") -> byte
             skyline_workplane.faces("<Z")
             .workplane()
             .transformed(rotate=cadquery.Vector(0, 0, -90))
-            .text(label, 7.5, -1.0),  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
+            .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
+                label,
+                7.5,
+                -1.0,
+                fontPath=str(Path(__file__).parent / "fonts" / "Inter-Regular.ttf"),
+            ),
         )
 
     with tempfile.TemporaryDirectory(prefix="skyline_") as tmpdir:
