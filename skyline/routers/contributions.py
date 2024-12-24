@@ -131,7 +131,10 @@ async def get_model(
     missing_days = weekday_number % 7
     days = [None] * missing_days + days
 
-    model = skyline_model(days)
+    model = skyline_model(
+        days=days,
+        label=f"{user}\n{year} - {contribution_selection.value.capitalize()} Contributions",
+    )
 
     return Response(
         model,
