@@ -12,6 +12,7 @@ interface State {
     modelOptionsSetters: {
         setYear: (year: number) => void;
         setContributions: (contributions: ModelConfiguration['contributions']) => void;
+        setIncludeLabels: (includeLabels: boolean) => void;
     };
 }
 
@@ -50,6 +51,15 @@ export const useStore = create<State>()(
                         },
                         undefined,
                         'setContributions',
+                    );
+                },
+                setIncludeLabels: (includeLabels) => {
+                    set(
+                        (state) => {
+                            state.modelOptions.include_labels = includeLabels;
+                        },
+                        undefined,
+                        'setIncludeLabels',
                     );
                 },
             },

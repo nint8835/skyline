@@ -82,6 +82,7 @@ async def get_model(
     contribution_selection: Annotated[
         ModelContributionSelection, Query(alias="contributions")
     ] = ModelContributionSelection.All,
+    include_labels: bool = False,
 ):
     """Retrieve the contributions model for a given user and year."""
     async with db.begin():
@@ -133,7 +134,10 @@ async def get_model(
 
     model = skyline_model(
         days=days,
-        label=f"{user}\n{year} - {contribution_selection.value.capitalize()} Contributions",
+        label=f"{user}\n{year} - {contribution_selection.value.capitalize()} Contributions"
+        if include_labels
+        else None,
+        include_month_label=include_labels,
     )
 
     return Response(

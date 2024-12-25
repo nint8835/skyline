@@ -110,6 +110,10 @@ export type GetModelQueryParams = {
      * @default all
      */
     contributions?: Schemas.ModelContributionSelection;
+    /**
+     * @default false
+     */
+    include_labels?: boolean;
 };
 
 export type GetModelError = Fetcher.ErrorWrapper<{

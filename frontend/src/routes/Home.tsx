@@ -86,6 +86,55 @@ function ContributionOptionRadioButton({
     );
 }
 
+function LabelCheckBox() {
+    const {
+        modelOptions: { include_labels: includeLabels },
+        modelOptionsSetters: { setIncludeLabels },
+    } = useStore();
+    const Icon = includeLabels ? CircleCheckBig : Circle;
+
+    const [tooltipOpen, setTooltipOpen] = useState(false);
+    const {
+        refs: tooltipRefs,
+        floatingStyles: tooltipStyles,
+        context: tooltipContext,
+    } = useFloating({
+        open: tooltipOpen,
+        onOpenChange: setTooltipOpen,
+    });
+    const { isMounted: tooltipIsMounted, styles: tooltipTransitonStyles } = useTransitionStyles(tooltipContext);
+    const tooltipHover = useHover(tooltipContext);
+    const { getReferenceProps: getTooltipReferenceProps, getFloatingProps: getTooltipFloatingProps } = useInteractions([
+        tooltipHover,
+    ]);
+
+    return (
+        <>
+            <div
+                className="mt-2 flex cursor-pointer flex-row justify-center gap-2 transition-all hover:text-zinc-400"
+                onClick={() => setIncludeLabels(!includeLabels)}
+                ref={tooltipRefs.setReference}
+                {...getTooltipReferenceProps()}
+            >
+                <Icon />
+                Label model (slow)
+            </div>
+            {tooltipIsMounted && (
+                <div
+                    ref={tooltipRefs.setFloating}
+                    style={{ ...tooltipStyles, ...tooltipTransitonStyles }}
+                    {...getTooltipFloatingProps()}
+                >
+                    <p className="max-w-prose rounded-md bg-zinc-700 p-2">
+                        Label the bottom of the model with information such as your username and the year. Enabling this
+                        will significantly slow down model generation.
+                    </p>
+                </div>
+            )}
+        </>
+    );
+}
+
 function BottomBar() {
     const {
         modelOptions,
@@ -202,6 +251,7 @@ function BottomBar() {
                             workAvailable={workContributionsAvailable}
                         />
                     </RadioGroup>
+                    <LabelCheckBox />
                 </div>
                 {importExplanationTooltipIsMounted && !availableYears.length && (
                     <div
