@@ -26,7 +26,7 @@ export function getModelUrl(configuration: ModelConfiguration) {
     const url = new URL(`/contributions/model/${year}`, window.location.origin);
     Object.entries(query).forEach(([key, value]) => {
         if (value !== undefined) {
-            url.searchParams.append(key, value);
+            url.searchParams.append(key, value.valueOf().toString());
         }
     });
 
