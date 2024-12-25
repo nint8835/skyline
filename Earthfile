@@ -57,14 +57,14 @@ app:
     ENV PYTHONUNBUFFERED=1
     ENV PATH="/skyline/venv/bin:$PATH"
 
-    COPY +python-deps/venv /skyline/venv
-    COPY --keep-ts +frontend/dist /skyline/frontend/dist
-    COPY . .
-
     RUN apt-get update && \
         apt-get install -y libgl1 && \
         apt-get clean && \
 	    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+    COPY +python-deps/venv /skyline/venv
+    COPY --keep-ts +frontend/dist /skyline/frontend/dist
+    COPY . .
 
     ENTRYPOINT ["python", "-m", "skyline"]
     CMD ["start"]
