@@ -162,9 +162,13 @@ async def get_model(
     missing_days = weekday_number % 7
     days = [None] * missing_days + days
 
+    year_label = (
+        f"{start_year} - {end_year}" if start_year != end_year else str(start_year)
+    )
+
     model = skyline_model(
         days=days,
-        label=f"{user}\n{year} - {contribution_selection.value.capitalize()} Contributions"
+        label=f"{user}\n{year_label} - {contribution_selection.value.capitalize()} Contributions"
         if include_labels
         else None,
         include_month_label=include_labels,

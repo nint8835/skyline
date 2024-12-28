@@ -138,7 +138,7 @@ function LabelCheckBox() {
 function BottomBar() {
     const {
         modelOptions,
-        modelOptionsSetters: { setStartYear, setContributions },
+        modelOptionsSetters: { setStartYear, setEndYear, setContributions },
     } = useStore();
 
     const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
@@ -210,6 +210,20 @@ function BottomBar() {
                                 value={modelOptions.start_year}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                                     setStartYear(parseInt(e.target.value, 10) || 0)
+                                }
+                            >
+                                <option>Select a year</option>
+                                {availableYears.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </Select>
+                            <Select
+                                className="flex-1 rounded-md bg-zinc-900 p-4"
+                                value={modelOptions.end_year as number | undefined}
+                                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                                    setEndYear(parseInt(e.target.value, 10) || 0)
                                 }
                             >
                                 <option>Select a year</option>
