@@ -45,26 +45,25 @@ def skyline_model(
 
     base_polyline = PendingPolyline((center_row_offset, center_col_offset))
 
+    #     C─────────────────────────────┬───D
+    #     │                             │   │
+    # A───B                             │   │
+    # │   │                             │   │
+    # │   │                             │   │
+    # │   │                             │   │
+    # │   │                             F───E
+    # │   │                             │
+    # H───┴─────────────────────────────G
     (
-        base_polyline
-        # First week, top left
-        .push(first_day_row * GRID_SQUARE_SIZE, 0)
-        # First week, top right
-        .push(first_day_row * GRID_SQUARE_SIZE, GRID_SQUARE_SIZE)
-        # Second week, top left
-        .push(0, GRID_SQUARE_SIZE)
-        # Last week, top right
-        .push(0, (cols + 1) * GRID_SQUARE_SIZE)
-        # Last week, bottom right
-        .push((last_day_row + 1) * GRID_SQUARE_SIZE, (cols + 1) * GRID_SQUARE_SIZE)
-        # Last week, bottom left
-        .push((last_day_row + 1) * GRID_SQUARE_SIZE, cols * GRID_SQUARE_SIZE)
-        # Second last week, bottom right
-        .push(7 * GRID_SQUARE_SIZE, cols * GRID_SQUARE_SIZE)
-        # First week, bottom left
-        .push(7 * GRID_SQUARE_SIZE, 0)
-        # # First week, top left
-        .push(first_day_row * GRID_SQUARE_SIZE, 0)
+        base_polyline.push(first_day_row * GRID_SQUARE_SIZE, 0)  # A
+        .push(first_day_row * GRID_SQUARE_SIZE, GRID_SQUARE_SIZE)  # B
+        .push(0, GRID_SQUARE_SIZE)  # C
+        .push(0, (cols + 1) * GRID_SQUARE_SIZE)  # D
+        .push((last_day_row + 1) * GRID_SQUARE_SIZE, (cols + 1) * GRID_SQUARE_SIZE)  # E
+        .push((last_day_row + 1) * GRID_SQUARE_SIZE, cols * GRID_SQUARE_SIZE)  # F
+        .push(7 * GRID_SQUARE_SIZE, cols * GRID_SQUARE_SIZE)  # G
+        .push(7 * GRID_SQUARE_SIZE, 0)  # H
+        .push(first_day_row * GRID_SQUARE_SIZE, 0)  # A
     )
 
     skyline_workplane = (
