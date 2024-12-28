@@ -43,7 +43,9 @@ def skyline_model(
     center_row_offset = -GRID_SQUARE_SIZE * 7 / 2
     center_col_offset = -GRID_SQUARE_SIZE * cols / 2
 
-    base_polyline = PendingPolyline((center_row_offset, center_col_offset))
+    base_polyline = PendingPolyline(
+        (center_row_offset, (center_col_offset - GRID_SQUARE_SIZE))
+    )
 
     #     C─────────────────────────────┬───D
     #     │                             │   │
@@ -93,7 +95,7 @@ def skyline_model(
             skyline_workplane.faces("<Z")
             .workplane()
             # TODO: Use a better way to position the label rather than a hardcoded offset
-            .transformed(offset=cadquery.Vector(0, GRID_SQUARE_SIZE * 25, 0))
+            .transformed(offset=cadquery.Vector(0, -1 * center_col_offset, 0))
             .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
                 "Jan",
                 7.5,
@@ -103,7 +105,7 @@ def skyline_model(
             )
             # TODO: Use a better way to position the label rather than a hardcoded offset
             .transformed(
-                offset=cadquery.Vector(0, GRID_SQUARE_SIZE * -51, 0),
+                offset=cadquery.Vector(0, 2 * center_col_offset + GRID_SQUARE_SIZE, 0),
                 rotate=cadquery.Vector(0, 0, 180),
             )
             .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
@@ -118,8 +120,8 @@ def skyline_model(
     grid = cadquery.Assembly()
 
     for index, count in enumerate(days):
-        col_offset = (-GRID_SQUARE_SIZE * 52 / 2) + GRID_SQUARE_SIZE * (index // 7)
-        row_offset = (-GRID_SQUARE_SIZE * 7 / 2) + GRID_SQUARE_SIZE * (index % 7)
+        col_offset = center_col_offset + GRID_SQUARE_SIZE * (index // 7)
+        row_offset = center_row_offset + GRID_SQUARE_SIZE * (index % 7)
 
         if not count:
             continue
