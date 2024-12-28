@@ -12,13 +12,14 @@ INTER_FONT_PATH = str(Path(__file__).parent / "fonts" / "Inter-Regular.ttf")
 
 
 class PendingPolyline:
-    def __init__(self, local_offset: tuple[int | float, int | float] = (0, 0)):
+    def __init__(self, offset_x: int | float = 0, offset_y: int | float = 0):
         self.points: list[tuple[int | float, int | float]] = []
-        self.local_offset = local_offset
+        self.offset_x = offset_x
+        self.offset_y = offset_y
 
     def push(self, x: int | float, y: int | float) -> Self:
-        x += self.local_offset[0]
-        y += self.local_offset[1]
+        x += self.offset_x
+        y += self.offset_y
 
         # Do not push a point into the polyline if it is as the same location as the previous point
         # Doing so will result in a "BRep_API: command not done" error
@@ -35,17 +36,15 @@ def skyline_model(
     label: str | None = "",
     include_month_label: bool = True,
 ) -> bytes:
-    cols = math.ceil(len(days) / 7.0)
+    cols = math.floor(len(days) / 7.0)
     first_day_row = days.index(next(day for day in days if day is not None))
     # First week is None-padded, but last week is not None-padded
     # Therefore, to get the row of the last day we use the length of the last week
-    last_day_row = len(days[7 * (cols - 1) :]) - 1
+    last_day_row = len(days[7 * cols :]) - 1
     center_row_offset = -GRID_SQUARE_SIZE * 7 / 2
     center_col_offset = -GRID_SQUARE_SIZE * cols / 2
 
-    base_polyline = PendingPolyline(
-        (center_row_offset, (center_col_offset - GRID_SQUARE_SIZE))
-    )
+    base_polyline = PendingPolyline(center_row_offset, center_col_offset)
 
     #     C─────────────────────────────┬───D
     #     │                             │   │
@@ -95,7 +94,9 @@ def skyline_model(
             skyline_workplane.faces("<Z")
             .workplane()
             # TODO: Use a better way to position the label rather than a hardcoded offset
-            .transformed(offset=cadquery.Vector(0, -1 * center_col_offset, 0))
+            .transformed(
+                offset=cadquery.Vector(0, -1 * center_col_offset - GRID_SQUARE_SIZE, 0)
+            )
             .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
                 "Jan",
                 7.5,
