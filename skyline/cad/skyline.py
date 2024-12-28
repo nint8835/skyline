@@ -12,10 +12,14 @@ INTER_FONT_PATH = str(Path(__file__).parent / "fonts" / "Inter-Regular.ttf")
 
 
 class PendingPolyline:
-    def __init__(self):
-        self.points: list[tuple[int, int]] = []
+    def __init__(self, local_offset: tuple[int | float, int | float] = (0, 0)):
+        self.points: list[tuple[int | float, int | float]] = []
+        self.local_offset = local_offset
 
-    def push(self, x: int, y: int) -> Self:
+    def push(self, x: int | float, y: int | float) -> Self:
+        x += self.local_offset[0]
+        y += self.local_offset[1]
+
         # Do not push a point into the polyline if it is as the same location as the previous point
         # Doing so will result in a "BRep_API: command not done" error
         if len(self.points) > 0 and self.points[-1] == (x, y):
@@ -36,8 +40,10 @@ def skyline_model(
     # First week is None-padded, but last week is not None-padded
     # Therefore, to get the row of the last day we use the length of the last week
     last_day_row = len(days[7 * (cols - 1) :]) - 1
+    center_row_offset = -GRID_SQUARE_SIZE * 7 / 2
+    center_col_offset = -GRID_SQUARE_SIZE * cols / 2
 
-    base_polyline = PendingPolyline()
+    base_polyline = PendingPolyline((center_row_offset, center_col_offset))
 
     (
         base_polyline
@@ -68,28 +74,28 @@ def skyline_model(
         .extrude(GRID_BASE_HEIGHT)
     )
 
-    # grid = cadquery.Assembly()
+    grid = cadquery.Assembly()
 
-    # for index, count in enumerate(days):
-    #     col_offset = (-GRID_SQUARE_SIZE * 52 / 2) + GRID_SQUARE_SIZE * (index // 7)
-    #     row_offset = (-GRID_SQUARE_SIZE * 7 / 2) + GRID_SQUARE_SIZE * (index % 7)
+    for index, count in enumerate(days):
+        col_offset = (-GRID_SQUARE_SIZE * 52 / 2) + GRID_SQUARE_SIZE * (index // 7)
+        row_offset = (-GRID_SQUARE_SIZE * 7 / 2) + GRID_SQUARE_SIZE * (index % 7)
 
-    #     if count is None:
-    #         continue
+        if not count:
+            continue
 
-    #     grid.add(
-    #         cadquery.Workplane("XY").box(
-    #             GRID_SQUARE_SIZE,
-    #             GRID_SQUARE_SIZE,
-    #             count + GRID_BASE_HEIGHT,
-    #             centered=False,
-    #         ),
-    #         loc=cadquery.Location(cadquery.Vector(row_offset, col_offset, 0)),
-    #     )
+        grid.add(
+            cadquery.Workplane("XY").box(
+                GRID_SQUARE_SIZE,
+                GRID_SQUARE_SIZE,
+                count,
+                centered=False,
+            ),
+            loc=cadquery.Location(
+                cadquery.Vector(row_offset, col_offset, GRID_BASE_HEIGHT)
+            ),
+        )
 
-    # skyline_workplane = (
-    #     cadquery.Workplane("XY").center(0, 0).workplane().add(grid.toCompound())
-    # )
+    skyline_workplane = skyline_workplane.add(grid.toCompound())
 
     # if label:
     #     skyline_workplane = cast(
