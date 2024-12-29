@@ -1,7 +1,7 @@
 import math
 import tempfile
 from pathlib import Path
-from typing import Self, Sequence, cast
+from typing import Self, Sequence
 
 import cadquery
 
@@ -75,29 +75,27 @@ def skyline_model(
     )
 
     if label:
-        skyline_workplane = cast(
-            cadquery.Workplane,
+        skyline_workplane = (
             skyline_workplane.faces("<Z")
             .workplane()
             .transformed(rotate=cadquery.Vector(0, 0, -90))
-            .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
+            .text(
                 label,
                 7.5,
                 -1.0,
                 fontPath=INTER_FONT_PATH,
-            ),
+            )
         )
 
     if include_month_label:
-        skyline_workplane = cast(
-            cadquery.Workplane,
+        skyline_workplane = (
             skyline_workplane.faces("<Z")
             .workplane()
             # TODO: Use a better way to position the label rather than a hardcoded offset
             .transformed(
                 offset=cadquery.Vector(0, -1 * center_col_offset - GRID_SQUARE_SIZE, 0)
             )
-            .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
+            .text(
                 "Jan",
                 7.5,
                 -1.0,
@@ -109,13 +107,13 @@ def skyline_model(
                 offset=cadquery.Vector(0, 2 * center_col_offset + GRID_SQUARE_SIZE, 0),
                 rotate=cadquery.Vector(0, 0, 180),
             )
-            .text(  # type: ignore - Decorator on .text currently breaks typing. PR opened to resolve this (https://github.com/CadQuery/cadquery/pull/1733)
+            .text(
                 "Dec",
                 7.5,
                 -1.0,
                 fontPath=INTER_FONT_PATH,
                 valign="top",
-            ),
+            )
         )
 
     grid = cadquery.Assembly()

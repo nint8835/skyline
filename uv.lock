@@ -3,10 +3,10 @@ requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version < '3.13' and platform_machine == 'arm64' and sys_platform == 'darwin'",
     "python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux'",
-    "(python_full_version < '3.13' and platform_machine != 'arm64' and platform_machine != 'x86_64') or (python_full_version < '3.13' and platform_machine == 'arm64' and sys_platform != 'darwin') or (python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux')",
+    "(python_full_version < '3.13' and platform_machine != 'arm64' and sys_platform == 'darwin') or (python_full_version < '3.13' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'linux')",
     "python_full_version >= '3.13' and platform_machine == 'arm64' and sys_platform == 'darwin'",
     "python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.13' and platform_machine != 'arm64' and platform_machine != 'x86_64') or (python_full_version >= '3.13' and platform_machine == 'arm64' and sys_platform != 'darwin') or (python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux')",
+    "(python_full_version >= '3.13' and platform_machine != 'arm64' and sys_platform == 'darwin') or (python_full_version >= '3.13' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'linux')",
 ]
 
 [[package]]
@@ -72,9 +72,9 @@ wheels = [
 [[package]]
 name = "cadquery"
 version = "2.5.0.dev0"
-source = { git = "https://github.com/CadQuery/cadquery.git#5429f618c6723b47f07ba5394a912e22b0dd5cff" }
+source = { git = "https://github.com/CadQuery/cadquery.git#0ebfa2b258b60d70f733bebe3aad835df0e88913" }
 dependencies = [
-    { name = "cadquery-ocp", version = "7.7.2", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'arm64' and platform_machine != 'x86_64') or (platform_machine == 'arm64' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform != 'linux')" },
+    { name = "cadquery-ocp", version = "7.7.2", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'arm64' and sys_platform == 'darwin') or (platform_machine != 'x86_64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "cadquery-ocp", version = "7.7.2", source = { url = "https://github.com/CadQuery/ocp-build-system/releases/download/7.7.2.0/cadquery_ocp-7.7.2-cp312-cp312-macosx_11_0_arm64.whl" }, marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
     { name = "cadquery-ocp", version = "7.7.2", source = { url = "https://github.com/CadQuery/ocp-build-system/releases/download/7.7.2.0/cadquery_ocp-7.7.2-cp312-cp312-manylinux_2_35_x86_64.whl" }, marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "casadi" },
@@ -90,11 +90,12 @@ name = "cadquery-ocp"
 version = "7.7.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "(python_full_version < '3.13' and platform_machine != 'arm64' and platform_machine != 'x86_64') or (python_full_version < '3.13' and platform_machine == 'arm64' and sys_platform != 'darwin') or (python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux')",
-    "(python_full_version >= '3.13' and platform_machine != 'arm64' and platform_machine != 'x86_64') or (python_full_version >= '3.13' and platform_machine == 'arm64' and sys_platform != 'darwin') or (python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux')",
+    "(python_full_version < '3.13' and platform_machine != 'arm64' and sys_platform == 'darwin') or (python_full_version < '3.13' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'linux')",
+    "(python_full_version >= '3.13' and platform_machine != 'arm64' and sys_platform == 'darwin') or (python_full_version >= '3.13' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'linux')",
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4d/da/52d0d0b148a015ded47b4f51cd0d5dba43f71bdc94f2050e9b8209d30786/cadquery_ocp-7.7.2-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:78a7903267cd9986181b634a315ca66fac1bb9e6dbfaf60724d812b3a2cc77bf", size = 186017529 },
+    { url = "https://files.pythonhosted.org/packages/9b/15/f738b679609071932395138925eb97358c36eebf6433ac2596e9b7f7a2cf/cadquery_ocp-7.7.2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:51ffbcd6d356d4f0c2e5f9e1581226121cd730fe4521eabac05e9d71e6a43f6f", size = 166437260 },
     { url = "https://files.pythonhosted.org/packages/c7/78/f81639f0cd4e899ed2cee705a255ef1abe8d97b06f6f3f4b6aaf8d4b2a5d/cadquery_ocp-7.7.2-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha256:7ac2d83b4f4b3d7c35421a1d9f8fec2adc73b6ed6cac50c1ffcede5552e38e9b", size = 143036527 },
     { url = "https://files.pythonhosted.org/packages/5f/20/0525739dbeb8bac7738efcff2a700ac55256b52bc331fb2cd8d9f1201635/cadquery_ocp-7.7.2-cp312-cp312-win_amd64.whl", hash = "sha256:d9e5c8ef5aeb1d3fb8f0b207ed1a2b781d22dc3e9b9c0551f52342f5a6ee7fc5", size = 91287161 },
 ]
@@ -132,10 +133,6 @@ dependencies = [
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cf/e0/8d2c6a350101b6f73548a1ceba4b93b60e436060ed647e5fb5d5e0b17fed/casadi-3.6.7.tar.gz", hash = "sha256:21cde87288afebb32a2a035bf6b6a91a025e24ee14aba7a0ae5515707b9887c1", size = 5132668 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/ec/a872e058a1f3ef766b4cf514be7a4bcb543fa9bf7e97cc27303fee21b368/casadi-3.6.7-cp27-none-macosx_10_13_x86_64.macosx_10_13_intel.whl", hash = "sha256:65976cabb6f8b5eecd72b346edbc4211cf0c8743c1ab9109ddc0eb0407da5a7e", size = 44946511 },
-    { url = "https://files.pythonhosted.org/packages/44/77/ca3dd37f92cadda99d2018b996546c548b641e068cd1566cc10527909170/casadi-3.6.7-cp27-none-manylinux1_i686.whl", hash = "sha256:05ef1a87ac6e173cba3762f0ad0ba50c02154317a1135317a23c446a149a2e12", size = 48369489 },
-    { url = "https://files.pythonhosted.org/packages/30/12/5743fceaf79bad73ceebdf10f4ea5c4f3abad778af5d8e132f0c44ba8d35/casadi-3.6.7-cp27-none-manylinux2010_x86_64.whl", hash = "sha256:8cefef3e30c36e89df94b94ba19eb3588b960ff713d7631233d3402d34544f47", size = 54350031 },
-    { url = "https://files.pythonhosted.org/packages/7e/fb/fbf0fd2b5c28cb36612ceb240c7e76c51a9367b73d727cfac5b303a79145/casadi-3.6.7-cp27-none-win_amd64.whl", hash = "sha256:3a51b7731126ca1767accbe6747df7ba0087fc32537ab7e5843db88ab42454e3", size = 44660650 },
     { url = "https://files.pythonhosted.org/packages/73/96/1f8323b62c663898179dd0c74edbe09ae94d674eed4ad5eb95c40d3bb49d/casadi-3.6.7-cp312-none-macosx_10_13_x86_64.macosx_10_13_intel.whl", hash = "sha256:f780e496157ab1caeb6fe19079e4508c2d7a9f5489b298e04c40438a3ba0caf4", size = 44955332 },
     { url = "https://files.pythonhosted.org/packages/9c/49/8a1ff97a94e219142d36c7c0b70d6ad7c79c4927efa53d5a8be29a51a32b/casadi-3.6.7-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:c02a304f5e8b147bca343e84b4de39629e2b761901c1fe99ecffa66c99875b80", size = 40416554 },
     { url = "https://files.pythonhosted.org/packages/5c/dd/242806ccb9d36f6c006d43ad844c752566ed8cc0c0f026a86b3c8c7c2ecb/casadi-3.6.7-cp312-none-manylinux2014_aarch64.whl", hash = "sha256:290e92a7e2f4cecffc229dc196a85855e7dbedf6929eed1850b27e4ad8ad67f0", size = 43904952 },
@@ -197,7 +194,7 @@ name = "click"
 version = "8.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz", hash = "sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de", size = 336121 }
 wheels = [
@@ -458,17 +455,18 @@ wheels = [
 
 [[package]]
 name = "nlopt"
-version = "2.8.0"
+version = "2.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/ff/44efc8d024cee1b8bc985188ad99b60192cfbbb8b8793b1f214a1aaa5d25/nlopt-2.8.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:11539da1d091fa0cb982150210445676ad3132de27696b00bcf2f8f8da686da9", size = 357611 },
-    { url = "https://files.pythonhosted.org/packages/9c/41/eb8e9aaa74998c3d35de0efafdaf76812739d366635efb7e46fd2c0e668a/nlopt-2.8.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2fac548c26f2837f348f204860ba2ba49c60bddfe1d280e11f9a0c66dde4b1c9", size = 427524 },
-    { url = "https://files.pythonhosted.org/packages/96/fc/e3c53858845f232c060b76c91a7b2afba818373d5a5d2cf7e7fa0671f315/nlopt-2.8.0-cp312-cp312-win_amd64.whl", hash = "sha256:86733d1ce1b4fb54f1917c342d14a9631e912bab723b077cf87c7fe5c8d64d43", size = 349228 },
-    { url = "https://files.pythonhosted.org/packages/0d/6b/771ee669da54c908dc48f377a630d01de965883bf2a66437d8c9856640d8/nlopt-2.8.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:1d6410d267a4a6b3ad97cd266ab9062cd19d8209eee4b9af75a0b78a9fcf738f", size = 357761 },
-    { url = "https://files.pythonhosted.org/packages/91/5c/dd2ef32b609e39c1e7058153567dc269623f36644c09d3840ee11a418050/nlopt-2.8.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fc2f065ca5f6b25c4f160468f1fc6272795267fb3b3d9ff4809a8a34e0b6da98", size = 427529 },
+    { url = "https://files.pythonhosted.org/packages/4a/23/a561f90db2c7854ece5df25d922eea3d4fcc9c643aefd62da435fa6a0db7/nlopt-2.9.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:d57635fa4219bb1bf138e27d1370479637f13fc40f9680979f67459912e74dc0", size = 367607 },
+    { url = "https://files.pythonhosted.org/packages/e8/ce/1b208e71fba9d81e5f45250d1ff19f1fda5aeb74cab2ccc09303296f4aec/nlopt-2.9.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cfb42c90e6005521481696ce0ee08070e295d7046e5d810c5e0871dd5f82431c", size = 437911 },
+    { url = "https://files.pythonhosted.org/packages/02/4e/4cdcaca1c1a9c99c414fffcd20c43e51b3bfff69e37383015e2c52901b9a/nlopt-2.9.0-cp312-cp312-win_amd64.whl", hash = "sha256:209e014b3926f53da2f4e9aeef6d28c067c31bca77e72331c72c9a721e445750", size = 358018 },
+    { url = "https://files.pythonhosted.org/packages/21/be/60767a526278c9b898993aa1b28aabd4c1e6b19ef8ab66a1ede1615797a4/nlopt-2.9.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:73bbc23cf53db4bd4662bbb213f8fd3c2d5d3732cf074c1bc8e164aa35d8e936", size = 367724 },
+    { url = "https://files.pythonhosted.org/packages/45/5a/913eae06b3140cefb9ba9a2632ebebf77114e728e5a7139c4a1668811dac/nlopt-2.9.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4c642538ec7698be12036c9bb0dbc0a50f6aa31e3790f67ac96aabf01306c5c3", size = 437888 },
+    { url = "https://files.pythonhosted.org/packages/cf/99/27058da7f7ac61bef50e6cedfd5b982ff082f3bcd7603b6d014d5f5cd8d6/nlopt-2.9.0-cp313-cp313-win_amd64.whl", hash = "sha256:4bf6c851c333319e8a3a53a290842c88fc780e779c4b656e10147e4a7ed22939", size = 357850 },
 ]
 
 [[package]]
@@ -705,7 +703,7 @@ dependencies = [
     { name = "alembic" },
     { name = "authlib" },
     { name = "cadquery" },
-    { name = "cadquery-ocp", version = "7.7.2", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'arm64' and platform_machine != 'x86_64') or (platform_machine == 'arm64' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform != 'linux')" },
+    { name = "cadquery-ocp", version = "7.7.2", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine != 'arm64' and sys_platform == 'darwin') or (platform_machine != 'x86_64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "cadquery-ocp", version = "7.7.2", source = { url = "https://github.com/CadQuery/ocp-build-system/releases/download/7.7.2.0/cadquery_ocp-7.7.2-cp312-cp312-macosx_11_0_arm64.whl" }, marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
     { name = "cadquery-ocp", version = "7.7.2", source = { url = "https://github.com/CadQuery/ocp-build-system/releases/download/7.7.2.0/cadquery_ocp-7.7.2-cp312-cp312-manylinux_2_35_x86_64.whl" }, marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "fastapi" },
@@ -730,7 +728,7 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.13.2" },
     { name = "authlib", specifier = ">=1.3.2" },
     { name = "cadquery", git = "https://github.com/CadQuery/cadquery.git" },
-    { name = "cadquery-ocp", marker = "(platform_machine != 'arm64' and platform_machine != 'x86_64') or (platform_machine == 'arm64' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform != 'linux')" },
+    { name = "cadquery-ocp", marker = "(platform_machine != 'arm64' and sys_platform == 'darwin') or (platform_machine != 'x86_64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')" },
     { name = "cadquery-ocp", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'", url = "https://github.com/CadQuery/ocp-build-system/releases/download/7.7.2.0/cadquery_ocp-7.7.2-cp312-cp312-macosx_11_0_arm64.whl" },
     { name = "cadquery-ocp", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'", url = "https://github.com/CadQuery/ocp-build-system/releases/download/7.7.2.0/cadquery_ocp-7.7.2-cp312-cp312-manylinux_2_35_x86_64.whl" },
     { name = "fastapi", specifier = ">=0.115.0" },
