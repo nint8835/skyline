@@ -44,7 +44,7 @@ frontend:
 
     COPY +node-deps/node_modules ./node_modules
 
-    COPY --chown=node:node package.json package-lock.json postcss.config.js tailwind.config.js vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json ./
+    COPY --chown=node:node package.json package-lock.json postcss.config.js vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json ./
     COPY --chown=node:node frontend frontend
     RUN npm run build
 
@@ -58,7 +58,7 @@ app:
     ENV PATH="/skyline/venv/bin:$PATH"
 
     RUN apt-get update && \
-        apt-get install -y libgl1 && \
+        apt-get install -y libgl1 libxrender1 && \
         apt-get clean && \
 	    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
