@@ -55,7 +55,7 @@ function ContributionOptionRadioButton({
             <div ref={disabledTooltipRefs.setReference} {...disabledTooltipGetReferenceProps()}>
                 <Field
                     disabled={optionUnavailable}
-                    className="flex cursor-pointer flex-row gap-2 transition-all hover:text-zinc-400 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:text-zinc-50"
+                    className="flex cursor-pointer flex-row gap-2 transition-all hover:text-zinc-400 data-disabled:cursor-not-allowed data-disabled:opacity-50 data-disabled:hover:text-zinc-50"
                 >
                     <Radio value={option}>
                         {({ checked }) => {
