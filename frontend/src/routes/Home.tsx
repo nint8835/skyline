@@ -285,6 +285,14 @@ function BottomBar() {
                         </Button>
                     </div>
                 </Field>
+                <div className="flex justify-center">
+                    <a
+                        className="text-zinc-400 underline transition-colors hover:text-zinc-200"
+                        href="/skyline-utility-models.zip"
+                    >
+                        Utility models
+                    </a>
+                </div>
             </div>
         </div>
     );
