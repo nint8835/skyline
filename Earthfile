@@ -30,27 +30,29 @@ python-deps:
     SAVE ARTIFACT venv
 
 node-deps:
-    FROM cgr.dev/chainguard/node:latest
+    FROM node:lts-slim
     WORKDIR /skyline
 
-    COPY --chown=node:node package.json package-lock.json ./
+    COPY package.json package-lock.json ./
     RUN npm install
 
     SAVE ARTIFACT node_modules
 
 frontend:
-    FROM cgr.dev/chainguard/node:latest
+    FROM node:lts-slim
     WORKDIR /skyline
 
     COPY +node-deps/node_modules ./node_modules
 
-    COPY --chown=node:node package.json package-lock.json postcss.config.js vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json ./
-    COPY --chown=node:node frontend frontend
+    COPY package.json package-lock.json postcss.config.js vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json ./
+    COPY frontend frontend
     RUN npm run build
 
     SAVE ARTIFACT --keep-ts frontend/dist
 
 app:
+    ARG TAG
+
     FROM --platform=linux/amd64 python:3.12-slim-bookworm
     WORKDIR /skyline
 
@@ -69,4 +71,4 @@ app:
     ENTRYPOINT ["python", "-m", "skyline"]
     CMD ["start"]
 
-    SAVE IMAGE --push ghcr.io/nint8835/skyline:latest
+    SAVE IMAGE --push ghcr.io/nint8835/skyline:latest ghcr.io/nint8835/skyline:$TAG
