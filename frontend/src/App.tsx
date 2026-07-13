@@ -1,6 +1,6 @@
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
-import { fetchGetCurrentUser } from '@/queries/api/skylineComponents';
+import { getCurrentUser } from '@/queries/api';
 import { HomeRoute } from '@/routes/Home';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -12,7 +12,7 @@ const router = createBrowserRouter([
     {
         path: '/',
         loader: async () => {
-            const currentUser = await fetchGetCurrentUser({});
+            const { data: currentUser } = await getCurrentUser({ throwOnError: true });
             useStore.getState().setUser(currentUser);
 
             return currentUser;

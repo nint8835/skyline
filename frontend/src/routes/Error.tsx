@@ -1,17 +1,8 @@
-import { type ErrorResponseSchema } from '@/queries/api/skylineSchemas';
+import { getErrorMessage } from '@/lib/util';
 import { useRouteError } from 'react-router-dom';
 
 export function ErrorPage() {
-    const error = useRouteError() as any;
-    console.log(error);
-
-    let message = 'An unknown error occurred';
-
-    if (error instanceof Error) {
-        message = error.message;
-    } else if ('stack' in error && 'detail' in error.stack) {
-        message = (error.stack as ErrorResponseSchema).detail;
-    }
+    const message = getErrorMessage(useRouteError());
 
     return (
         <div className="flex h-dvh w-dvw flex-col items-center justify-center gap-2">

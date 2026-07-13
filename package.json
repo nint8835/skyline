@@ -7,8 +7,7 @@
         "dev": "vite",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
-        "preview": "vite preview",
-        "gen-openapi": "npx openapi-codegen gen skyline"
+        "preview": "vite preview"
     },
     "dependencies": {
         "@floating-ui/react": "^0.26.25",
@@ -27,12 +26,13 @@
         "tailwind-merge": "^2.5.3",
         "three": "^0.169.0",
         "three-stdlib": "^2.33.0",
+        "zod": "4.4.3",
         "zustand": "^5.0.0-rc.2"
     },
     "devDependencies": {
         "@eslint/js": "^9.11.1",
-        "@openapi-codegen/cli": "^2.0.2",
-        "@openapi-codegen/typescript": "^8.0.2",
+        "@hey-api/openapi-ts": "0.99.0",
+        "@hey-api/vite-plugin": "0.3.2",
         "@tailwindcss/postcss": "^4.0.0",
         "@types/node": "^22.7.4",
         "@types/react": "^18.3.10",

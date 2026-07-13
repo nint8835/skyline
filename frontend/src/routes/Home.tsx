@@ -3,10 +3,16 @@ import { GitHubIcon } from '@/icons/GitHub';
 import { queryClient } from '@/lib/query';
 import { useStore } from '@/lib/state';
 import { cn, getModelUrl, ModelConfiguration, onQueryError } from '@/lib/util';
-import { useGetYears, useStartImport, useWorkContributionsAvailable } from '@/queries/api/skylineComponents';
+import {
+    getYearsOptions,
+    getYearsQueryKey,
+    useStartImportMutation,
+    workContributionsAvailableOptions,
+} from '@/queries/api';
 import { useFloating, useHover, useInteractions, useTransitionStyles } from '@floating-ui/react';
 import { Button, Field, Input, Label, Radio, RadioGroup, Select } from '@headlessui/react';
 import { Circle, CircleCheckBig } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { type ChangeEvent, useEffect, useState } from 'react';
 
 function LoginPrompt() {
@@ -141,10 +147,15 @@ function BottomBar() {
         modelOptionsSetters: { setYear, setContributions },
     } = useStore();
 
-    const { data: availableYears, isPending: yearsPending } = useGetYears({}, { throwOnError: true });
-    const { data: workContributionsAvailable, isPending: workContributionsAvailablePending } =
-        useWorkContributionsAvailable({ pathParams: { year: modelOptions.year } }, { throwOnError: true });
-    const { mutateAsync: importYear, isPending: importPending } = useStartImport({
+    const { data: availableYears, isPending: yearsPending } = useQuery({
+        ...getYearsOptions(),
+        throwOnError: true,
+    });
+    const { data: workContributionsAvailable, isPending: workContributionsAvailablePending } = useQuery({
+        ...workContributionsAvailableOptions({ path: { year: modelOptions.year } }),
+        throwOnError: true,
+    });
+    const { mutateAsync: importYear, isPending: importPending } = useStartImportMutation({
         onError: onQueryError,
     });
 
@@ -187,8 +198,8 @@ function BottomBar() {
             return;
         }
 
-        await importYear({ pathParams: { year: importYearSelection } });
-        queryClient.invalidateQueries({ queryKey: ['contributions', 'years'] });
+        await importYear({ path: { year: importYearSelection } });
+        queryClient.invalidateQueries({ queryKey: getYearsQueryKey() });
         setYear(importYearSelection);
         setImportYearSelection(null);
     }

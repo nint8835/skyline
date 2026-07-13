@@ -1,5 +1,4 @@
-import type { GetModelPathParams, GetModelQueryParams } from '@/queries/api/skylineComponents';
-import { ErrorResponseSchema } from '@/queries/api/skylineSchemas';
+import type { ErrorResponseSchema, GetModelData } from '@/queries/api';
 import { clsx, type ClassValue } from 'clsx';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
@@ -8,17 +7,32 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function onQueryError(error: any) {
-    const stack = (error as Error).stack as string | ErrorResponseSchema;
-
-    if (typeof stack === 'string') {
-        toast.error(stack);
-    } else {
-        toast.error(stack.detail);
-    }
+function isErrorResponse(error: unknown): error is ErrorResponseSchema {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'detail' in error &&
+        typeof (error as { detail: unknown }).detail === 'string'
+    );
 }
 
-export type ModelConfiguration = GetModelPathParams & GetModelQueryParams;
+export function getErrorMessage(error: unknown) {
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    if (isErrorResponse(error)) {
+        return error.detail;
+    }
+
+    return 'An unknown error occurred';
+}
+
+export function onQueryError(error: unknown) {
+    toast.error(getErrorMessage(error));
+}
+
+export type ModelConfiguration = GetModelData['path'] & NonNullable<GetModelData['query']>;
 
 export function getModelUrl(configuration: ModelConfiguration) {
     const { year, ...query } = configuration;
