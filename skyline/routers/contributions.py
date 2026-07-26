@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
-from typing import Annotated, Any, Sequence
+from collections.abc import Sequence
+from datetime import UTC, datetime
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Path, Query, Response, status
 from fastapi.responses import JSONResponse
@@ -41,13 +42,13 @@ contributions_router = APIRouter(tags=["Contributions"])
 )
 async def start_import(
     year: Annotated[int, Path(description="The year to import contributions for.")],
-    user: str = Depends(require_user),
-    token: Any = Depends(require_token),
-    db: AsyncSession = Depends(get_db),
+    user: Annotated[str, Depends(require_user)],
+    token: Annotated[Any, Depends(require_token)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Import contributions for the current user."""
 
-    if year >= datetime.now(timezone.utc).year or year < 2005:
+    if year >= datetime.now(UTC).year or year < 2005:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content=ErrorResponseSchema(
@@ -77,8 +78,8 @@ async def start_import(
 @contributions_router.get("/model/{year}")
 async def get_model(
     year: int,
-    user: str = Depends(require_user),
-    db: AsyncSession = Depends(get_db),
+    user: Annotated[str, Depends(require_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
     contribution_selection: Annotated[
         ModelContributionSelection, Query(alias="contributions")
     ] = ModelContributionSelection.All,
@@ -127,7 +128,7 @@ async def get_model(
     days = list(contributions.values())
 
     # Pad the first week with None values to ensure the model is appropriately offset
-    first_day = list(contributions.keys())[0]
+    first_day = next(iter(contributions))
     weekday_number = first_day.isoweekday()
     missing_days = weekday_number % 7
     days = [None] * missing_days + days
@@ -151,8 +152,8 @@ async def get_model(
 
 @contributions_router.get("/years")
 async def get_years(
-    user: str = Depends(require_user),
-    db: AsyncSession = Depends(get_db),
+    user: Annotated[str, Depends(require_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Sequence[int]:
     """Get a list of years for which contributions have been imported."""
     async with db.begin():
@@ -171,7 +172,9 @@ async def get_years(
 
 @contributions_router.get("/work-contributions-available/{year}")
 async def work_contributions_available(
-    year: int, user: str = Depends(require_user), db: AsyncSession = Depends(get_db)
+    year: int,
+    user: Annotated[str, Depends(require_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> bool:
     """Get whether or not work contributions are available for the user for."""
     async with db.begin():

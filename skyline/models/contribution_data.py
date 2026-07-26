@@ -26,4 +26,4 @@ class ContributionData(Base):
     contributions: Mapped[str]
 
 
-__all__ = ["Contributions", "ContributionData", "ContributionImporter"]
+__all__ = ["ContributionData", "ContributionImporter", "Contributions"]

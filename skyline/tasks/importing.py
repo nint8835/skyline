@@ -1,5 +1,6 @@
+from collections.abc import Awaitable, Callable
 from datetime import date
-from typing import Any, Awaitable, Callable, cast
+from typing import Any, cast
 
 import httpx
 import structlog

@@ -1,5 +1,6 @@
 import enum
 import typing
+from typing import ClassVar
 
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
@@ -9,7 +10,7 @@ from .config import config
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    type_annotation_map = {
+    type_annotation_map: ClassVar = {
         enum.Enum: sqlalchemy.Enum(enum.Enum, native_enum=False),
         typing.Literal: sqlalchemy.Enum(enum.Enum, native_enum=False),
     }

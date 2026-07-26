@@ -21,8 +21,8 @@ dependencies = [
     "uvicorn>=0.30.6",
 ]
 
-[tool.uv]
-dev-dependencies = ["ruff>=0.6.5"]
+[dependency-groups]
+dev = ["ruff==0.16.0"]
 
 [tool.uv.sources]
 cadquery = { git = "https://github.com/CadQuery/cadquery.git" }

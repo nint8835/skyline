@@ -1,7 +1,8 @@
 import math
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Self, Sequence
+from typing import Self
 
 import cadquery
 
@@ -12,12 +13,12 @@ INTER_FONT_PATH = str(Path(__file__).parent / "fonts" / "Inter-Regular.ttf")
 
 
 class PendingPolyline:
-    def __init__(self, offset_x: int | float = 0, offset_y: int | float = 0):
+    def __init__(self, offset_x: float = 0, offset_y: float = 0):
         self.points: list[tuple[int | float, int | float]] = []
         self.offset_x = offset_x
         self.offset_y = offset_y
 
-    def push(self, x: int | float, y: int | float) -> Self:
+    def push(self, x: float, y: float) -> Self:
         x += self.offset_x
         y += self.offset_y
 
